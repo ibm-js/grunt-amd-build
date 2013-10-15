@@ -1,6 +1,6 @@
 # grunt-dojo-build
 
-> Grunt plugin to build a Dojo application
+> Grunt plugin to build Dojo applications.
 
 ## Getting Started
 This plugin requires Grunt `~0.4.1`

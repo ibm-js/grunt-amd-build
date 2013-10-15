@@ -1,0 +1,42 @@
+{
+  "name": "grunt-dojo-build",
+  "description": "Grunt plugin to build Dojo applications.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/clmath/grunt-dojo-build",
+  "author": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/clmath/grunt-dojo-build.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clmath/grunt-dojo-build/issues"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "https://github.com/clmath/grunt-dojo-build/blob/master/LICENSE"
+    }
+  ],
+  "main": "Gruntfile.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+	"grunt-contrib-concat": "~0.3.0"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt": "~0.4.1"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.1"
+  },
+  "keywords": [
+    "gruntplugin"
+  ]
+}

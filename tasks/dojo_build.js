@@ -1,9 +1,9 @@
 /*
  * grunt-dojo-build
- * https://github.com/clmath/grunt-dojo-build
+ * https://github.com/mathieu/grunt-dojo-build
  *
  * Copyright (c) 2013 
- * Licensed under the BSD license.
+ * Licensed under the MIT license.
  */
 
 'use strict';
@@ -13,7 +13,7 @@ module.exports = function(grunt) {
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
 
-  grunt.registerMultiTask('dojo_build', 'Grunt plugin to build a Dojo application', function() {
+  grunt.registerMultiTask('dojo_build', 'The best Grunt plugin ever.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
       punctuation: '.',
