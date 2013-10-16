@@ -1,11 +1,3 @@
-/*
- * grunt-dojo-build
- * https://github.com/clmath/grunt-dojo-build
- *
- * Copyright (c) 2013 
- * Licensed under the BSD license.
- */
-
 'use strict';
 
 module.exports = function(grunt) {

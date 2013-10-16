@@ -1,21 +1,11 @@
-/*
- * dojo-proto
- * https://github.com/mathieu/grunt
- *
- * Copyright (c) 2013 
- * Licensed under the MIT license.
- */
-
 "use strict";
 
 module.exports = function(grunt) {
   
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  
-  
   grunt.registerMultiTask("concatAmd", "Prototype plugin for Dojo 2 build system", function() {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options(),
+		res = "",
 		deps = grunt.config("internal.deps"),
 		out = grunt.config("out"),
 		fileToModule = function(filepath){
@@ -27,20 +17,26 @@ module.exports = function(grunt) {
 		
 	
 	deps = deps.map(function(dep){return dep + ".js";});
-    
-	grunt.config(["concat", "dist", "files", out+"src.js"], deps);
-	grunt.config(["concat", "dist", "options", "process"], addModuleName);
-	
-	
-	grunt.task.run("concat:dist");
-	
-	grunt.log.writeln("Writing the layer " + out + "src.js:");
+
+	deps = deps.filter(function(filepath) {
+        // Warn on and remove invalid source files (if nonull was set).
+        if (!grunt.file.exists(filepath)) {
+          grunt.log.warn('Source file "' + filepath + '" not found.');
+          return false;
+        } else {
+          return true;
+        }
+      });
+	  
+	res = deps.map(function(filepath) {
+        // Read file source.
+		var src = grunt.file.read(filepath);
+        return addModuleName(src,filepath);
+      }).join(";")
+	grunt.file.write(out+"src.js", res);
 		
-	// Print a success message.
+	grunt.log.writeln("Writing the layer " + out + "src.js:");
     deps.forEach(function(dep){grunt.log.writeln("File " + dep);});
-	
-	
-	
   });
 
 };

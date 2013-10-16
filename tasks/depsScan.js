@@ -1,11 +1,3 @@
-/*
- * dojo-proto
- * https://github.com/mathieu/grunt
- *
- * Copyright (c) 2013 
- * Licensed under the MIT license.
- */
-
 'use strict';
 
 module.exports = function(grunt) {
