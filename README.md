@@ -82,8 +82,10 @@ grunt.initConfig({
 })
 ```
 
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
+## Licensing
+
+This project is distributed by the Dojo Foundation and licensed under the ["New" BSD License](https://github.com/dojo/dojo/blob/master/LICENSE#L13-L41).
+All contributions require a [Dojo Foundation CLA](http://dojofoundation.org/about/claForm).
 
 ## Release History
 _(Nothing yet)_

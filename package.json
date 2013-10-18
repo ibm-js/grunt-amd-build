@@ -1,7 +1,7 @@
 {
   "name": "grunt-dojo-build",
-  "description": "Grunt plugin to build Dojo applications.",
-  "version": "0.1.1",
+  "description": "EXPERIMENTAL - Grunt plugin to build Dojo applications.",
+  "version": "0.1.2",
   "homepage": "https://github.com/clmath/grunt-dojo-build",
   "author": {},
   "repository": {
