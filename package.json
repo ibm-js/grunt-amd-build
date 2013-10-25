@@ -3,7 +3,7 @@
   "description": "EXPERIMENTAL - Grunt plugin to build Dojo applications.",
   "version": "0.1.3",
   "homepage": "https://github.com/clmath/grunt-dojo-build",
-  "author": {},
+  "author": "Clément Mathieu <clement.mathieu@outlook.com>",
   "repository": {
     "type": "git",
     "url": "git://github.com/clmath/grunt-dojo-build.git"
