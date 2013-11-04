@@ -1,6 +1,6 @@
 # grunt-dojo-build
 
-> Grunt plugin to build Dojo applications.
+> EXPERIMENTAL - Grunt plugin to build Dojo applications.
 
 ## Getting Started
 This plugin requires Grunt `~0.4.1`
@@ -16,7 +16,7 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 ```js
 grunt.loadNpmTasks('grunt-dojo-build');
 ```
-
+<!---
 ## The "dojo_build" task
 
 ### Overview
@@ -81,7 +81,7 @@ grunt.initConfig({
   },
 })
 ```
-
+-->
 ## Licensing
 
 This project is distributed by the Dojo Foundation and licensed under the ["New" BSD License](https://github.com/dojo/dojo/blob/master/LICENSE#L13-L41).
