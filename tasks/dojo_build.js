@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
-  // Master task
+    // Main task
 
-  grunt.registerTask('dojo_build', ["depsScan", "concatAmd"]);
+    grunt.registerTask("dojo_build", ["depsScan", "concatAmd"]);
 
 };

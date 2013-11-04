@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
+    grunt.registerTask("depsScan", "Prototype plugin for Dojo 2 build system", function () {
+        var modulesList = grunt.config("modulesList");
 
-  grunt.registerMultiTask('depsScan', 'Prototype plugin for Dojo 2 build system', function() {
-   	var options = this.options();
-	grunt.log.writeln("List of modules to include:");
-	options.modulesList.forEach(function(deps){grunt.log.writeln(deps);});
-	grunt.config('internal.deps', options.modulesList);
-  });
+        grunt.log.writeln("List of modules to include:");
+        modulesList.forEach(function (deps) {
+            grunt.log.writeln(deps);
+        });
+        grunt.config("internal.deps", modulesList);
+    });
 
 };
