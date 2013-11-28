@@ -16,39 +16,98 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 ```js
 grunt.loadNpmTasks('grunt-dojo-build');
 ```
-<!---
-## The "dojo_build" task
+
+## The "dojoBuild" task
 
 ### Overview
-In your project's Gruntfile, add a section named `dojo_build` to the data object passed into `grunt.initConfig()`.
+In your project's Gruntfile, add a section named `dojoBuild` to the data object passed into `grunt.initConfig()`.
 
 ```js
 grunt.initConfig({
-  dojo_build: {
-    options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
-  },
+	dojoBuild: {
+		baseUrl: "./",
+		dir: "dist",
+		optimize: "none",
+		packages: [{
+			name: "myapp",
+			location: "myapp"
+		}, {
+			name: "mypackage",
+			location: "mylocalpackage"
+		}],
+
+		map: {
+			"mypackage/foo": {
+				"mypackage/bar": "bar-mapped"
+			}
+		},
+
+		paths: { "mypackage/foo": "patch/foo"},
+		
+		layers: {
+			"myapp/src": {}
+		}		
+	},
 })
 ```
 
 ### Options
 
-#### options.separator
+#### baseUrl
 Type: `String`
-Default value: `',  '`
+Default value: `'./'`
 
-A string value that is used to do something with whatever.
+The reference url for the paths.
 
-#### options.punctuation
+More info: http://requirejs.org/docs/api.html#config-baseUrl
+
+#### dir
 Type: `String`
-Default value: `'.'`
+Default value: `'dist'`
 
-A string value that is used to do something else with whatever else.
+The path to the output directory.
 
+#### optimize
+Type: `String`
+Default value: `'none'`
+
+Can be none or uglify.
+
+If you want use uglify, you have to make sure uglify is installed and loaded in grunt. Instructions are available at https://github.com/gruntjs/grunt-contrib-uglify
+
+#### packages
+Type: `array`
+Default value: `[]`
+
+List of packages.
+
+More info: http://requirejs.org/docs/api.html#config-packages
+
+#### map
+Type: `object`
+Default value: `{}`
+
+Substitute a mid in a particular module to allow multiple versions of a module to be used in a project.
+
+More info: http://requirejs.org/docs/api.html#config-map
+
+#### paths
+Type: `object`
+Default value: `{}`
+
+Define a custom path for a specific module.
+
+More info: http://requirejs.org/docs/api.html#config-paths
+
+#### layers
+Type: `object`
+Default value: `{}`
+
+Define a layer that will be written with all its dependencies.
+
+
+
+<!--	
 ### Usage Examples
 
 #### Default Options

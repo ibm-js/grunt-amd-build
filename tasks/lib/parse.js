@@ -1,22 +1,20 @@
 /**
  * @license Copyright (c) 2010-2013, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
- * 
+ *
  */
+/* jshint -W074 */
+module.exports = (function () {
+    'use strict';
 
-/*jslint plusplus: true */
-/*global define: false */
-
-module.exports = (function (){
-	'use strict';
-	
-	var esprima = require('esprima');
+    var esprima = require('esprima');
 
     //This string is saved off because JSLint complains
     //about obj.arguments use, as 'reserved word'
     var argPropName = 'arguments';
 
     //From an esprima example for traversing its ast.
+
     function traverse(object, visitor) {
         var key, child;
 
@@ -39,7 +37,7 @@ module.exports = (function (){
         }
     }
 
-     /**
+    /**
      * Pulls out dependencies from an array literal with just string members.
      * If string literals, will just return those string values in an array,
      * skipping other items in the array.
@@ -50,6 +48,7 @@ module.exports = (function (){
      * If null is returned, then it means the input node was not a valid
      * dependency.
      */
+
     function getValidDeps(node) {
         if (!node || node.type !== 'ArrayExpression' || !node.elements) {
             return;
@@ -66,7 +65,7 @@ module.exports = (function (){
         return deps.length ? deps : undefined;
     }
 
-	var parse = {};
+    var parse = {};
 
 
     /**
@@ -90,7 +89,7 @@ module.exports = (function (){
         //If has replacement has resulted in if(true){} or if(false){}, take
         //the appropriate branch and skip the other one.
         if (hasHas && object.type === 'IfStatement' && object.test.type &&
-                object.test.type === 'Literal') {
+            object.test.type === 'Literal') {
             if (object.test.value) {
                 //Take the if branch
                 this.recurse(object.consequent, onMatch, options);
@@ -132,14 +131,13 @@ module.exports = (function (){
             //over the return value of the function, so only add it if asked.
             funcArgLength = node.params && node.params.length;
             if (funcArgLength) {
-                deps = (funcArgLength > 1 ? ["require", "exports", "module"] :
-                        ["require"]).concat(deps);
+                deps = (funcArgLength > 1 ? ["require", "exports", "module"] : ["require"]).concat(deps);
             }
         }
         return deps;
     };
 
- 
+
     /**
      * Finds all dependencies specified in dependency arrays and inside
      * simplified commonjs wrappers.
@@ -165,10 +163,10 @@ module.exports = (function (){
     //define.amd reference, as in: if (define.amd)
     parse.refsDefineAmd = function (node) {
         return node && node.type === 'MemberExpression' &&
-        node.object && node.object.name === 'define' &&
-        node.object.type === 'Identifier' &&
-        node.property && node.property.name === 'amd' &&
-        node.property.type === 'Identifier';
+            node.object && node.object.name === 'define' &&
+            node.object.type === 'Identifier' &&
+            node.property && node.property.name === 'amd' &&
+            node.property.type === 'Identifier';
     };
 
     //require(), requirejs(), require.config() and requirejs.config()
@@ -178,16 +176,16 @@ module.exports = (function (){
 
         if (node && node.type === 'CallExpression' && c) {
             if (c.type === 'Identifier' &&
-                    (c.name === 'require' ||
+                (c.name === 'require' ||
                     c.name === 'requirejs')) {
                 //A require/requirejs({}, ...) call
                 callName = c.name;
             } else if (c.type === 'MemberExpression' &&
-                    c.object &&
-                    c.object.type === 'Identifier' &&
-                    (c.object.name === 'require' ||
-                        c.object.name === 'requirejs') &&
-                    c.property && c.property.name === 'config') {
+                c.object &&
+                c.object.type === 'Identifier' &&
+                (c.object.name === 'require' ||
+                    c.object.name === 'requirejs') &&
+                c.property && c.property.name === 'config') {
                 // require/requirejs.config({}) call
                 callName = c.object.name + 'Config';
             }
@@ -208,9 +206,9 @@ module.exports = (function (){
             var arg;
 
             if (node && node.type === 'CallExpression' && node.callee &&
-                    node.callee.type === 'Identifier' &&
-                    node.callee.name === 'require' &&
-                    node[argPropName] && node[argPropName].length === 1) {
+                node.callee.type === 'Identifier' &&
+                node.callee.name === 'require' &&
+                node[argPropName] && node[argPropName].length === 1) {
 
                 arg = node[argPropName][0];
                 if (arg.type === 'Literal') {
@@ -267,7 +265,7 @@ module.exports = (function (){
                 factory = name;
                 name = deps = null;
             } else if (name.type !== 'Literal') {
-                 //An object literal, just null out
+                //An object literal, just null out
                 name = deps = factory = null;
             }
 
@@ -306,10 +304,10 @@ module.exports = (function (){
 
             return onMatch("define", null, name, deps, node);
         } else if (node.type === 'CallExpression' && node.callee &&
-                   node.callee.type === 'FunctionExpression' &&
-                   node.callee.body && node.callee.body.body &&
-                   node.callee.body.body.length === 1 &&
-                   node.callee.body.body[0].type === 'IfStatement') {
+            node.callee.type === 'FunctionExpression' &&
+            node.callee.body && node.callee.body.body &&
+            node.callee.body.body.length === 1 &&
+            node.callee.body.body[0].type === 'IfStatement') {
             bodyNode = node.callee.body.body[0];
             //Look for a define(Identifier) case, but only if inside an
             //if that has a define.amd test
@@ -337,6 +335,6 @@ module.exports = (function (){
             }
         }
     };
-	
+
     return parse;
 })();
