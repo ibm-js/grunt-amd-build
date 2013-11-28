@@ -16,10 +16,13 @@ module.exports = function (grunt) {
             };
 
         for (module in modules) {
-            if (modules.hasOwnProperty(module)) {
-                buffer += addModuleName(modules[module].content, modules[module].mid) + ";";
-            }
+            if (modules.hasOwnProperty(module) && module !== layerName) {
+				buffer += addModuleName(modules[module].content, modules[module].mid) + ";";
+		    }
         }
+		if (modules.hasOwnProperty(layerName)) {
+			buffer += addModuleName(modules[layerName].content, modules[layerName].mid) + ";"
+		}
 
         grunt.file.write(dir + "/" + layerName + ".js", buffer);
 
