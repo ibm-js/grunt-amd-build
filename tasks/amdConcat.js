@@ -1,13 +1,12 @@
 "use strict";
 
-
 module.exports = function (grunt) {
 
-    grunt.registerTask("amdConcat", "Prototype plugin for Dojo 2 build system", function () {
+    grunt.registerTask("amdConcat", function () {
         // Merge task-specific and/or target-specific options with these defaults.
         var layerName = this.args[0],
-            modules = grunt.config("dojoBuild." + layerName + "._modules"),
-            dir = grunt.config("dojoBuild.dir"),
+            modules = grunt.config("amdBuild." + layerName + "._modules"),
+            dir = grunt.config("amdBuild.dir"),
             buffer = "",
             module,
 
