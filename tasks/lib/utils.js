@@ -4,9 +4,9 @@ module.exports = (function () {
     var map, packages, paths, pkgs;
 
     function init(grunt) {
-        map = grunt.config("dojoBuild.map");
-        packages = grunt.config("dojoBuild.packages");
-        paths = grunt.config("dojoBuild.paths");
+        map = grunt.config("amdBuild.map");
+        packages = grunt.config("amdBuild.packages");
+        paths = grunt.config("amdBuild.paths");
         pkgs = (function () {
             var i, current,
                 pkgs = {};

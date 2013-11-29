@@ -4,9 +4,9 @@ module.exports = function (grunt) {
 
     // Main task
 
-    grunt.registerTask("dojoBuild", function () {
-        var layers = grunt.config("dojoBuild.layers"),
-            optimize = grunt.config("dojoBuild.optimize"),
+    grunt.registerTask("amdBuild", function () {
+        var layers = grunt.config("amdBuild.layers"),
+            optimize = grunt.config("amdBuild.optimize"),
             tasks = ["depsScan"];
 
         switch (optimize) {

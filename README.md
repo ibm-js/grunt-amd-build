@@ -1,6 +1,6 @@
-# grunt-dojo-build
+# grunt-amd-build
 
-> EXPERIMENTAL - Grunt plugin to build Dojo applications.
+> EXPERIMENTAL - Grunt plugin to build AMD applications.
 
 ## Getting Started
 This plugin requires Grunt `~0.4.1`
@@ -8,23 +8,23 @@ This plugin requires Grunt `~0.4.1`
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
 ```shell
-npm install grunt-dojo-build --save-dev
+npm install grunt-amd-build --save-dev
 ```
 
 Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
 
 ```js
-grunt.loadNpmTasks('grunt-dojo-build');
+grunt.loadNpmTasks('grunt-amd-build');
 ```
 
-## The "dojoBuild" task
+## The "amdBuild" task
 
 ### Overview
-In your project's Gruntfile, add a section named `dojoBuild` to the data object passed into `grunt.initConfig()`.
+In your project's Gruntfile, add a section named `amdBuild` to the data object passed into `grunt.initConfig()`.
 
 ```js
 grunt.initConfig({
-	dojoBuild: {
+	amdBuild: {
 		baseUrl: "./",
 		dir: "dist",
 		optimize: "none",
@@ -140,11 +140,12 @@ grunt.initConfig({
   },
 })
 ```
+```
 -->
 ## Licensing
 
-This project is distributed by the Dojo Foundation and licensed under the ["New" BSD License](https://github.com/dojo/dojo/blob/master/LICENSE#L13-L41).
+This project is distributed by the Dojo Foundation and licensed under the ["New" BSD License](./LICENSE).
 All contributions require a [Dojo Foundation CLA](http://dojofoundation.org/about/claForm).
 
 ## Release History
-_(Nothing yet)_
+0.2.0: prototype with basic configuration working

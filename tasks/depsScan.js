@@ -5,9 +5,9 @@ module.exports = function (grunt) {
         utils = require('./lib/utils');
     utils.init(grunt);
 
-    grunt.registerTask("depsScan", "Prototype plugin for Dojo 2 build system", function () {
+    grunt.registerTask("depsScan", function () {
         var layerName = this.args[0],
-            layerConfig = grunt.config("dojoBuild.layers." + layerName),
+            layerConfig = grunt.config("amdBuild.layers." + layerName),
             modules = {},
             includeList = [],
             excludeMap = {},
@@ -63,6 +63,6 @@ module.exports = function (grunt) {
             grunt.log.writeln("Added " + current.mid + " - Filepath: " + current.filepath);
         }
 
-        grunt.config("dojoBuild." + layerName + "._modules", modules);
+        grunt.config("amdBuild." + layerName + "._modules", modules);
     });
 };

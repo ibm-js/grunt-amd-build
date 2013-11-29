@@ -2,10 +2,10 @@
 
 module.exports = function (grunt) {
 
-    grunt.registerTask("amdUglify", "Prototype plugin for Dojo 2 build system", function () {
+    grunt.registerTask("amdUglify", function () {
         var layerName = this.args[0],
-            modules = grunt.config("dojoBuild." + layerName + "._modules"),
-            dir = grunt.config("dojoBuild.dir"),
+            modules = grunt.config("amdBuild." + layerName + "._modules"),
+            dir = grunt.config("amdBuild.dir"),
             deps = [],
             mid, module,
 
