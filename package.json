@@ -1,7 +1,7 @@
 {
   "name": "grunt-amd-build",
-  "description": "EXPERIMENTAL - Grunt plugin to build Dojo applications.",
-  "version": "0.2.2",
+  "description": "EXPERIMENTAL - Grunt plugin to build AMD applications.",
+  "version": "0.2.3",
   "homepage": "https://github.com/ibm-dojo/grunt-amd-build",
   "author": "Clément Mathieu <clement.mathieu@outlook.com>",
   "repository": {

@@ -1,6 +1,6 @@
 # grunt-amd-build
 
-> EXPERIMENTAL - Grunt plugin to build AMD applications.
+> EXPERIMENTAL - Grunt plugin to build [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) applications.
 
 ## Getting Started
 This plugin requires Grunt `~0.4.1`
