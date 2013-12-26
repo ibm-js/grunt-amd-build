@@ -5,10 +5,15 @@ module.exports = function (grunt) {
     // Main task
 
     grunt.registerTask("amdBuild", function () {
-        var layers = grunt.config("amdBuild.layers"),
-            optimize = grunt.config("amdBuild.optimize"),
-            tasks = ["depsScan"];
-
+        var configProp = this.args[0] || this.name,
+			cfg = config.normalize(grunt.config(configProp)),
+			layers = cfg.layers,
+            optimize = cfg.optimize,
+            tasks = ["depsScan", "buildPlugins"];
+		
+		configProp += "_api";
+		grunt.config([configProp], cfg);
+		
         switch (optimize) {
         case "none":
             tasks.push("amdConcat");
@@ -21,11 +26,10 @@ module.exports = function (grunt) {
         for (var layer in layers) {
             if (layers.hasOwnProperty(layer)) {
                 grunt.task.run(tasks.map(function (task) {
-                    return task + ":" + layer;
+                    return task + ":" + configProp + ":" + layer;
                 }));
             }
         }
 
     });
-
 };

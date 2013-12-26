@@ -36,6 +36,35 @@ module.exports = (function () {
             }
         }
     }
+	
+    //Like traverse, but visitor returning false just
+    //stops that subtree analysis, not the rest of tree
+    //visiting.
+    function traverseBroad(object, visitor) {
+        var key, child;
+
+        if (!object) {
+            return;
+        }
+
+        if (visitor.call(null, object) === false) {
+            return false;
+        }
+        for (key in object) {
+            if (object.hasOwnProperty(key)) {
+                child = object[key];
+                if (typeof child === 'object' && child !== null) {
+                    traverse(child, visitor);
+                }
+            }
+        }
+    }
+	
+	function isDefineNodeWithArgs (node) {
+        return node && node.type === 'CallExpression' &&
+               node.callee && node.callee.type === 'Identifier' &&
+               node.callee.name === 'define' && node[argPropName];
+    }
 
     /**
      * Pulls out dependencies from an array literal with just string members.
@@ -335,6 +364,206 @@ module.exports = (function () {
             }
         }
     };
+	
+	parse.toTransport = function (moduleName, contents) {
+		var astRoot, contentLines, modLine,
+			foundAnon,
+			scanCount = 0,
+			scanReset = false,
+			defineInfos = [];
+
+		try {
+			astRoot = esprima.parse(contents, {
+				loc: true
+			});
+		} catch (e) {
+			console.log('toTransport skipping ' + moduleName + ': ' +
+						 e.toString());
+			return contents;
+		}
+
+		//Find the define calls and their position in the files.
+		traverseBroad(astRoot, function (node) {
+			var args, firstArg, firstArgLoc, factoryNode,
+				needsId, depAction, range;
+
+			if (isDefineNodeWithArgs(node)) {
+				//The arguments are where its at.
+				args = node.arguments;
+				if (!args || !args.length) {
+					return;
+				}
+
+				firstArg = args[0];
+				firstArgLoc = firstArg.loc;
+
+				if (args.length === 1) {
+					if (firstArg.type === 'Identifier') {
+						//The define(factory) case, but
+						//only allow it if one Identifier arg,
+						//to limit impact of false positives.
+						needsId = true;
+						depAction = 'empty';
+					} else if (firstArg.type === 'FunctionExpression') {
+						//define(function(){})
+						factoryNode = firstArg;
+						needsId = true;
+						depAction = 'scan';
+					} else if (firstArg.type === 'ObjectExpression') {
+						//define({});
+						needsId = true;
+						depAction = 'skip';
+					} else if (firstArg.type === 'Literal' &&
+							   typeof firstArg.value === 'number') {
+						//define('12345');
+						needsId = true;
+						depAction = 'skip';
+					} else if (firstArg.type === 'UnaryExpression' &&
+							   firstArg.operator === '-' &&
+							   firstArg.argument &&
+							   firstArg.argument.type === 'Literal' &&
+							   typeof firstArg.argument.value === 'number') {
+						//define('-12345');
+						needsId = true;
+						depAction = 'skip';
+					} else if (firstArg.type === 'MemberExpression' &&
+							   firstArg.object &&
+							   firstArg.property &&
+							   firstArg.property.type === 'Identifier') {
+						//define(this.key);
+						needsId = true;
+						depAction = 'empty';
+					}
+				} else if (firstArg.type === 'ArrayExpression') {
+					//define([], ...);
+					needsId = true;
+					depAction = 'skip';
+				} else if (firstArg.type === 'Literal' &&
+						   typeof firstArg.value === 'string') {
+					//define('string', ....)
+					//Already has an ID.
+					needsId = false;
+					if (args.length === 2 &&
+						args[1].type === 'FunctionExpression') {
+						//Needs dependency scanning.
+						factoryNode = args[1];
+						depAction = 'scan';
+					} else {
+						depAction = 'skip';
+					}
+				} else {
+					//Unknown define entity, keep looking, even
+					//in the subtree for this node.
+					return;
+				}
+
+				range = {
+					needsId: needsId,
+					depAction: depAction,
+					node: node,
+					defineLoc: node.loc,
+					firstArgLoc: firstArgLoc,
+					factoryNode: factoryNode
+				};
+
+				//Only transform ones that do not have IDs. If it has an
+				//ID but no dependency array, assume it is something like
+				//a phonegap implementation, that has its own internal
+				//define that cannot handle dependency array constructs,
+				//and if it is a named module, then it means it has been
+				//set for transport form.
+				if (range.needsId) {
+					if (foundAnon) {
+						console.log(moduleName + ' has more than one anonymous ' +
+							'define. May be a built file from another ' +
+							'build system like, Ender. Skipping normalization.');
+						defineInfos = [];
+						return false;
+					} else {
+						foundAnon = range;
+						defineInfos.push(range);
+					}
+				} else if (depAction === 'scan') {
+					scanCount += 1;
+					if (scanCount > 1) {
+						//Just go back to an array that just has the
+						//anon one, since this is an already optimized
+						//file like the phonegap one.
+						if (!scanReset) {
+							defineInfos =  foundAnon ? [foundAnon] : [];
+							scanReset = true;
+						}
+					} else {
+						defineInfos.push(range);
+					}
+				}
+			}
+		});
+
+		if (!defineInfos.length) {
+			return contents;
+		}
+
+		//Reverse the matches, need to start from the bottom of
+		//the file to modify it, so that the ranges are still true
+		//further up.
+		defineInfos.reverse();
+
+		contentLines = contents.split('\n');
+
+		modLine = function (loc, contentInsertion) {
+			var startIndex = loc.start.column,
+			//start.line is 1-based, not 0 based.
+			lineIndex = loc.start.line - 1,
+			line = contentLines[lineIndex];
+			contentLines[lineIndex] = line.substring(0, startIndex) +
+									   contentInsertion +
+									   line.substring(startIndex,
+														  line.length);
+		};
+
+		defineInfos.forEach(function (info) {
+			var deps,
+				contentInsertion = '',
+				depString = '';
+
+			//Do the modifications "backwards", in other words, start with the
+			//one that is farthest down and work up, so that the ranges in the
+			//defineInfos still apply. So that means deps then id.
+			if (info.needsId && moduleName) {
+				contentInsertion += "'" + moduleName + "',";
+			}
+
+			if (info.depAction === 'scan') {
+				deps = parse.getAnonDepsFromNode(info.factoryNode);
+
+				if (deps.length) {
+					depString = '[' + deps.map(function (dep) {
+						return "'" + dep + "'";
+					}) + ']';
+				} else {
+					depString = '[]';
+				}
+				depString +=  ',';
+
+				if (info.factoryNode) {
+					//Already have a named module, need to insert the
+					//dependencies after the name.
+					modLine(info.factoryNode.loc, depString);
+				} else {
+					contentInsertion += depString;
+				}
+			}
+
+			if (contentInsertion) {
+				modLine(info.firstArgLoc, contentInsertion);
+			}
+		});
+
+		contents = contentLines.join('\n');
+
+		return contents;
+	};
 
     return parse;
 })();
