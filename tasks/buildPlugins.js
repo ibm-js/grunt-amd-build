@@ -44,11 +44,7 @@ module.exports = function (grunt) {
                 }
             });
         });
-
-        grunt.log.writeln(JSON.stringify(modules));
-        grunt.log.writeln(JSON.stringify(grunt.config([configProp, "layers", layerName, "modules"])));
-
-
+        grunt.config([configProp, "layers", layerName, "modules"], modules);
     });
 
 };

@@ -1,9 +1,12 @@
 {
   "name": "grunt-amd-build",
   "description": "EXPERIMENTAL - Grunt plugin to build AMD applications.",
-  "version": "0.2.3",
+  "version": "0.3.1",
   "homepage": "https://github.com/ibm-dojo/grunt-amd-build",
-  "author": "Clément Mathieu <clement.mathieu@outlook.com>",
+  "author": {
+    "name": "Clément Mathieu",
+    "email": "clement.mathieu@outlook.com"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/ibm-dojo/grunt-amd-build.git"
@@ -37,5 +40,7 @@
   "keywords": [
     "gruntplugin"
   ],
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "_id": "grunt-amd-build@0.3.0",
+  "_from": "grunt-amd-build@~0.3.0"
 }
