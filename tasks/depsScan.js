@@ -20,13 +20,16 @@ module.exports = function (grunt) {
             },
             current,
 
+			fileExists = function(path){
+			    if (!grunt.file.exists(path)) {
+                    grunt.fail.warn('Source file "' + path + '" not found.');
+                    return false;
+                }
+				return true;
+			},
             //to include and exist
             isModuleValid = function (module) {
                 if (excludeMap[module.mid] || modules[module.mid]) {
-                    return false;
-                }
-                if (!grunt.file.exists(module.filepath)) {
-                    grunt.fail.warn('Source file "' + module.filepath + '" not found.');
                     return false;
                 }
                 if (module.mid !== layerName && config.layers[module.mid]) {
@@ -35,29 +38,29 @@ module.exports = function (grunt) {
                         module.mid + " will not be loaded if the layer " +
                         layerName + " is loaded before the layer " + module.mid + ".");
                 }
-                return true;
+                return fileExists(module.filepath);
             },
             addToInclude = function (module) {
                 includeList.push(module);
             },
             getModuleFromMid = function (current) {
                 return function (mid) {
-                    var ressource,
+                    var resource,
                         index = mid.indexOf('!');
 
                     if (index > -1) {
                         // This module is a plugin
-                        ressource = mid.substring(index + 1, mid.length);
+                        resource = mid.substring(index + 1, mid.length);
                         mid = mid.substring(0, index);
                     }
 
                     mid = normalize(mid, current);
 
-                    if (ressource) {
+                    if (resource) {
                         if (!plugins[mid]) {
                             plugins[mid] = [];
                         }
-                        plugins[mid].push(ressource);
+                        plugins[mid].push(resource);
                     }
 
                     return {
@@ -75,12 +78,20 @@ module.exports = function (grunt) {
 
         //Populate the excludeMap
         layerConfig.exclude.map(normalize).forEach(function (mid) {
-            excludeMap[mid] = true;
+            var path = utils.nameToFilepath(mid, config);
+			if (fileExists(path)){
+				parse.findDependencies(mid, grunt.file.read(path)).map(function(dep){
+					return normalize(dep, mid);
+				}).forEach(function(dep){
+					excludeMap[dep] = true;
+				});
+			}
+			excludeMap[mid] = true;
         });
+		
 
         //Initialize includeList
-
-        layerConfig.include.map(getModuleFromMid()).filter(isModuleValid).forEach(addToInclude);
+		layerConfig.include.map(getModuleFromMid()).filter(isModuleValid).forEach(addToInclude);
 
         //Search dependencies
         while (includeList.length) {
