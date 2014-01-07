@@ -20,13 +20,13 @@ module.exports = function (grunt) {
             },
             current,
 
-			fileExists = function(path){
-			    if (!grunt.file.exists(path)) {
+            fileExists = function (path) {
+                if (!grunt.file.exists(path)) {
                     grunt.fail.warn('Source file "' + path + '" not found.');
                     return false;
                 }
-				return true;
-			},
+                return true;
+            },
             //to include and exist
             isModuleValid = function (module) {
                 if (excludeMap[module.mid] || modules[module.mid]) {
@@ -79,19 +79,19 @@ module.exports = function (grunt) {
         //Populate the excludeMap
         layerConfig.exclude.map(normalize).forEach(function (mid) {
             var path = utils.nameToFilepath(mid, config);
-			if (fileExists(path)){
-				parse.findDependencies(mid, grunt.file.read(path)).map(function(dep){
-					return normalize(dep, mid);
-				}).forEach(function(dep){
-					excludeMap[dep] = true;
-				});
-			}
-			excludeMap[mid] = true;
+            if (fileExists(path)) {
+                parse.findDependencies(mid, grunt.file.read(path)).map(function (dep) {
+                    return normalize(dep, mid);
+                }).forEach(function (dep) {
+                    excludeMap[dep] = true;
+                });
+            }
+            excludeMap[mid] = true;
         });
-		
+
 
         //Initialize includeList
-		layerConfig.include.map(getModuleFromMid()).filter(isModuleValid).forEach(addToInclude);
+        layerConfig.include.map(getModuleFromMid()).filter(isModuleValid).forEach(addToInclude);
 
         //Search dependencies
         while (includeList.length) {

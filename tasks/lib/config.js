@@ -9,7 +9,8 @@ module.exports = (function () {
             packages: [],
             map: {},
             paths: {},
-            layers: {}
+            layers: {},
+            pluginFiles: []
         },
         addTrailingSlash = function (string) {
             if (string.charAt(string.length - 1) !== '/') {
@@ -63,7 +64,8 @@ module.exports = (function () {
                     config.layers[layerName] = {
                         include: include,
                         exclude: exclude,
-                        outputPath: config.dir + layerName + ".js"
+                        outputPath: config.dir + layerName + ".js",
+                        header: layerObj.header || ""
                     };
                 });
             }

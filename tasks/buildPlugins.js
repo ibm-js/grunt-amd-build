@@ -3,8 +3,10 @@
 
 module.exports = function (grunt) {
 
-    var eachProp = require("./lib/lang").eachProp,
-        toTransport = require("./lib/parse").toTransport,
+    var libDir = "./lib/",
+        eachProp = require(libDir + "lang").eachProp,
+        toTransport = require(libDir + "parse").toTransport,
+        utils = require(libDir + "utils"),
         requirejs = require("requirejs");
 
 
@@ -13,18 +15,38 @@ module.exports = function (grunt) {
     grunt.registerTask("buildPlugins", function () {
         var configProp = this.args[0],
             layerName = this.args[1],
-            modules = grunt.config([configProp, "layers", layerName, "modules"]),
-            plugins = grunt.config([configProp, "layers", layerName, "plugins"]),
-            plugin,
-            addToModules = {
-                asModule: function (moduleName, content) {
-                    content = toTransport(moduleName, content);
-                    modules[moduleName] = {
-                        mid: moduleName,
-                        content: content
-                    };
-                }
+            config = grunt.config([configProp]),
+            pluginFiles = config.pluginFiles,
+            layerConfig = config.layers[layerName],
+            outputPath = layerConfig.outputPath,
+            modules = layerConfig.modules,
+            plugins = layerConfig.plugins,
+            write = function (content) {
+                layerConfig.header += content;
+            },
+            writeFile = function (filepath, content) {
+                var o = {
+                    filepath: config.dir + filepath,
+                    content: content
+                };
+                pluginFiles.push(o);
+            },
+            normalize = function (mid, current) {
+                return utils.normalize(mid, current, true, config);
             };
+
+        write.asModule = function (moduleName, content) {
+            content = toTransport(moduleName, content);
+            modules[moduleName] = {
+                mid: moduleName,
+                content: content
+            };
+        };
+        writeFile.asModule = function (moduleName, filepath, content) {
+            content = toTransport(moduleName, content);
+            writeFile(filepath, content);
+        };
+
 
         requirejs.config({
             //Pass the top-level main.js/index.js require
@@ -33,18 +55,44 @@ module.exports = function (grunt) {
             nodeRequire: require,
             isBuild: true
         });
-        requirejs.config(grunt.config([configProp]));
+        requirejs.config(config);
 
-        eachProp(plugins, function (pluginName, ressources) {
-            plugin = requirejs(pluginName);
-            ressources.forEach(function (ressource) {
-                requirejs(pluginName + "!" + ressource);
+        eachProp(plugins, function (pluginName, resources) {
+            var plugin = requirejs(pluginName),
+                normalizedresources;
+
+            if (plugin.pluginBuilder) {
+                plugin = requirejs(normalize(plugin.pluginBuilder, pluginName));
+            }
+
+            if (plugin.normalize) {
+                normalizedresources = resources.map(function (resource) {
+                    return plugin.normalize(resource, normalize);
+                });
+            } else {
+                normalizedresources = resources.map(normalize);
+            }
+
+            resources.forEach(function (resource) {
+                requirejs(pluginName + "!" + resource);
                 if (plugin.write) {
-                    plugin.write(pluginName, ressource, addToModules, {});
+                    plugin.write(pluginName, resource, write);
+                }
+                if (plugin.writeFile) {
+                    plugin.writeFile(pluginName, resource, requirejs, writeFile);
                 }
             });
+
+            if (plugin.onLayerEnd) {
+                plugin.onLayerEnd(write, {
+                    name: layerName,
+                    path: outputPath
+                });
+            }
         });
-        grunt.config([configProp, "layers", layerName, "modules"], modules);
+
+        // Save modifications
+        grunt.config([configProp], config);
     });
 
 };

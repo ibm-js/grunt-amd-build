@@ -7,9 +7,15 @@ module.exports = function (grunt) {
     grunt.registerTask("amdConcat", "Prototype plugin for Dojo 2 build system", function () {
         var configProp = this.args[0],
             layerName = this.args[1],
-            layerPath = grunt.config([configProp, "layers", layerName, "outputPath"]),
-            modules = grunt.config([configProp, "layers", layerName, "modules"]),
-            buffer = "";
+            config = grunt.config([configProp]),
+            pluginFiles = config.pluginFiles,
+            layerPath = config.layers[layerName].outputPath,
+            modules = config.layers[layerName].modules,
+            buffer = config.layers[layerName].header;
+
+        pluginFiles.forEach(function (o) {
+            grunt.file.write(o.filepath, o.content);
+        });
 
         forEachModules(modules, layerName, function (module) {
             buffer += module.content + ";";
