@@ -1,16 +1,12 @@
-"use strict";
-
 
 module.exports = function (grunt) {
-
+	"use strict";
+	
     var libDir = "./lib/",
         eachProp = require(libDir + "lang").eachProp,
         toTransport = require(libDir + "parse").toTransport,
         utils = require(libDir + "utils"),
         requirejs = require("requirejs");
-
-
-
 
     grunt.registerTask("buildPlugins", function () {
         var configProp = this.args[0],
@@ -94,5 +90,4 @@ module.exports = function (grunt) {
         // Save modifications
         grunt.config([configProp], config);
     });
-
 };

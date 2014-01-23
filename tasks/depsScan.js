@@ -1,11 +1,12 @@
-"use strict";
 
 module.exports = function (grunt) {
+	"use strict";
+
     var libDir = "./lib/",
         parse = require(libDir + "parse"),
         utils = require(libDir + "utils");
 
-    grunt.registerTask("depsScan", "Prototype plugin for Dojo 2 build system", function () {
+    grunt.registerTask("depsScan", function () {
         var configProp = this.args[0],
             layerName = this.args[1],
             config = grunt.config(configProp),

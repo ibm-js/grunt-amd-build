@@ -1,8 +1,8 @@
-"use strict";
 
 module.exports = (function () {
-
-    return {
+	"use strict";
+    
+	return {
         getOwn: function (obj, prop) {
             return obj.hasOwnProperty(prop) && obj[prop];
         },

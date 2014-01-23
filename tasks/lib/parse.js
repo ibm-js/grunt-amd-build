@@ -1,11 +1,6 @@
-/**
- * @license Copyright (c) 2010-2013, The Dojo Foundation All Rights Reserved.
- * Available via the MIT or new BSD license.
- *
- */
 /* jshint -W074 */
 module.exports = (function () {
-    'use strict';
+    "use strict";
 
     var esprima = require('esprima');
 
@@ -564,6 +559,5 @@ module.exports = (function () {
 
         return contents;
     };
-
     return parse;
 })();

@@ -1,9 +1,10 @@
-"use strict";
 
 module.exports = function (grunt) {
+	"use strict";
+	
     var forEachModules = require("./lib/utils").forEachModules;
 
-    grunt.registerTask("amdUglify", "Prototype plugin for Dojo 2 build system", function () {
+    grunt.registerTask("amdUglify", function () {
         var configProp = this.args[0],
             layerName = this.args[1],
             dir = grunt.config([configProp, "dir"]),
@@ -30,5 +31,4 @@ module.exports = function (grunt) {
         grunt.config(["uglify", layerName, "options"], sourceMapOptions);
         grunt.task.run(["uglify:" + layerName]);
     });
-
 };

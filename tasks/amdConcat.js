@@ -1,10 +1,10 @@
-"use strict";
-
 
 module.exports = function (grunt) {
+	"use strict";
+
     var forEachModules = require("./lib/utils").forEachModules;
 
-    grunt.registerTask("amdConcat", "Prototype plugin for Dojo 2 build system", function () {
+    grunt.registerTask("amdConcat", function () {
         var configProp = this.args[0],
             layerName = this.args[1],
             config = grunt.config([configProp]),
@@ -24,5 +24,4 @@ module.exports = function (grunt) {
         grunt.file.write(layerPath, buffer);
         grunt.log.write("Writing the layer " + layerPath + "...").ok();
     });
-
 };

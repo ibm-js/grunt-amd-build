@@ -1,7 +1,8 @@
-"use strict";
 
 module.exports = (function () {
-    var eachProp = require("./lang").eachProp,
+	"use strict";    
+	
+	var eachProp = require("./lang").eachProp,
         defaultConfig = {
             baseUrl: "./",
             dir: "dist/",
@@ -13,12 +14,11 @@ module.exports = (function () {
             pluginFiles: []
         },
         addTrailingSlash = function (string) {
-            if (string.charAt(string.length - 1) !== '/') {
-                return string + '/';
+            if (string.charAt(string.length - 1) !== "/") {
+                return string + "/";
             }
             return string;
         };
-
 
     return {
         normalize: function (cfg) {
@@ -41,7 +41,7 @@ module.exports = (function () {
                 config.pkgs = {};
 
                 cfg.packages.forEach(function (pkg) {
-                    pkg = typeof pkg === 'string' ? {
+                    pkg = typeof pkg === "string" ? {
                         name: pkg
                     } : pkg;
 
