@@ -102,7 +102,7 @@ and merge them into your local clone and then push them to your GitHub fork:
 
 ```bash
 $ cd grunt-amd-build
-$ git remote add upstream git@github.com:ibm-dojo/grunt-amd-build.git
+$ git remote add upstream git@github.com:ibm-js/grunt-amd-build.git
 $ git fetch upstream
 ```
 
