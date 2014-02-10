@@ -1,10 +1,9 @@
-
 module.exports = function (grunt) {
-	"use strict";
+    "use strict";
 
     var config = require("./lib/config");
-    
-	// Main task
+
+    // Main task
     grunt.registerTask("amdBuild", function () {
         var configProp = this.args[0] || this.name,
             cfg = config.normalize(grunt.config(configProp)),

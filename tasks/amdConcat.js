@@ -1,6 +1,5 @@
-
 module.exports = function (grunt) {
-	"use strict";
+    "use strict";
 
     var forEachModules = require("./lib/utils").forEachModules;
 

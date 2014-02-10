@@ -1,7 +1,7 @@
-"use strict";
 /* jshint -W074 */
 
 module.exports = (function () {
+    "use strict";
 
     var getOwn = require("./lang").getOwn,
 

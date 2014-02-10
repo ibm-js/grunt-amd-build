@@ -1,8 +1,7 @@
-
 module.exports = (function () {
-	"use strict";    
-	
-	var eachProp = require("./lang").eachProp,
+    "use strict";
+
+    var eachProp = require("./lang").eachProp,
         defaultConfig = {
             baseUrl: "./",
             dir: "dist/",

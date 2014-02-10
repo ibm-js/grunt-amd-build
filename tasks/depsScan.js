@@ -1,13 +1,22 @@
-
 module.exports = function (grunt) {
-	"use strict";
+    "use strict";
 
     var libDir = "./lib/",
-        parse = require(libDir + "parse"),
-        utils = require(libDir + "utils");
+        utils = require(libDir + "utils"),
+        requirejs = require("requirejs");
+
+    requirejs.config({
+        //Pass the top-level main.js/index.js require
+        //function to requirejs so that node modules
+        //are loaded relative to the top-level JS file.
+        nodeRequire: require,
+    });
+
+
 
     grunt.registerTask("depsScan", function () {
-        var configProp = this.args[0],
+        var done = this.async(),
+            configProp = this.args[0],
             layerName = this.args[1],
             config = grunt.config(configProp),
             layerConfig = config.layers[layerName],
@@ -55,7 +64,7 @@ module.exports = function (grunt) {
                         mid = mid.substring(0, index);
                     }
 
-                    mid = normalize(mid, current);
+                    mid = utils.normalize(mid, current, true, config);
 
                     if (resource) {
                         if (!plugins[mid]) {
@@ -70,48 +79,65 @@ module.exports = function (grunt) {
                     };
                 };
             },
-            normalize = function (mid, current) {
-                return utils.normalize(mid, current, true, config);
+            getNormalize = function (current) {
+                return function (mid) {
+                    return utils.normalize(mid, current, true, config);
+                };
+            },
+            task = function (req) {
+                req(["parse", "transform"], function (parse, transform) {
+                    var toTransport = function (moduleName, filepath) {
+                        var content = grunt.file.read(current.filepath);
+                        return transform.toTransport(null, moduleName, filepath, content);
+                    };
+
+                    grunt.log.subhead("Starting to process layer: " + layerName);
+                    grunt.log.writeln("Looking for " + layerName + " dependencies...");
+
+                    //Populate the excludeMap
+                    layerConfig.exclude.map(getNormalize(null)).forEach(function (mid) {
+                        var path = utils.nameToFilepath(mid, config);
+                        if (fileExists(path)) {
+                            parse.findDependencies(mid, grunt.file.read(path))
+                                .map(getNormalize(mid))
+                                .forEach(function (dep) {
+                                    excludeMap[dep] = true;
+                                });
+                        }
+                        excludeMap[mid] = true;
+                    });
+
+
+                    //Initialize includeList
+                    layerConfig.include.map(getModuleFromMid())
+                        .filter(isModuleValid)
+                        .forEach(addToInclude);
+
+                    //Search dependencies
+                    while (includeList.length) {
+                        current = includeList.pop();
+                        current.content = toTransport(current.mid, current.filepath);
+                        current.deps = parse.findDependencies(current.mid, current.content)
+                            .map(getModuleFromMid(current.mid));
+                        current.includeDeps = current.deps.filter(isModuleValid);
+                        current.includeDeps.forEach(addToInclude);
+
+                        modules[current.mid] = current;
+                    }
+
+                    grunt.verbose.or.ok();
+                    grunt.verbose.writeln("Found dependencies for " + layerName);
+                    utils.forEachModules(modules, layerName, function (module) {
+                        grunt.verbose.writeln(module.mid);
+                    });
+
+                    grunt.config([configProp, "layers", layerName, "modules"], modules);
+                    grunt.config([configProp, "layers", layerName, "plugins"], plugins);
+
+                    done(true);
+                });
             };
 
-        grunt.log.subhead("Starting to process layer: " + layerName);
-        grunt.log.writeln("Looking for " + layerName + " dependencies...");
-
-        //Populate the excludeMap
-        layerConfig.exclude.map(normalize).forEach(function (mid) {
-            var path = utils.nameToFilepath(mid, config);
-            if (fileExists(path)) {
-                parse.findDependencies(mid, grunt.file.read(path)).map(function (dep) {
-                    return normalize(dep, mid);
-                }).forEach(function (dep) {
-                    excludeMap[dep] = true;
-                });
-            }
-            excludeMap[mid] = true;
-        });
-
-
-        //Initialize includeList
-        layerConfig.include.map(getModuleFromMid()).filter(isModuleValid).forEach(addToInclude);
-
-        //Search dependencies
-        while (includeList.length) {
-            current = includeList.pop();
-            current.content = parse.toTransport(current.mid, grunt.file.read(current.filepath));
-            current.deps = parse.findDependencies(current.mid, current.content).map(getModuleFromMid(current.mid));
-            current.includeDeps = current.deps.filter(isModuleValid);
-            current.includeDeps.forEach(addToInclude);
-
-            modules[current.mid] = current;
-        }
-
-        grunt.verbose.or.ok();
-        grunt.verbose.writeln("Found dependencies for " + layerName);
-        utils.forEachModules(modules, layerName, function (module) {
-            grunt.verbose.writeln(module.mid);
-        });
-
-        grunt.config([configProp, "layers", layerName, "modules"], modules);
-        grunt.config([configProp, "layers", layerName, "plugins"], plugins);
+        requirejs.tools.useLib(task);
     });
 };
