@@ -1,26 +1,24 @@
 module.exports = function (grunt) {
-    "use strict";
+	"use strict";
 
-    var forEachModules = require("./lib/utils").forEachModules;
+	var libDir = "./lib/",
+		forEachModules = require(libDir + "lang").forEachModules,
+		normalizeCfg = require(libDir + "normalizeConfig");
 
-    grunt.registerTask("amdConcat", function () {
-        var configProp = this.args[0],
-            layerName = this.args[1],
-            config = grunt.config([configProp]),
-            pluginFiles = config.pluginFiles,
-            layerPath = config.layers[layerName].outputPath,
-            modules = config.layers[layerName].modules,
-            buffer = config.layers[layerName].header;
+	grunt.registerTask("amdConcat", function (layerName, buildCfg) {
+		var buildConfig = normalizeCfg.build(grunt.config(buildCfg)),
+			layerConfig = buildConfig.layers[layerName],
+			buffer = layerConfig.header;
 
-        pluginFiles.forEach(function (o) {
-            grunt.file.write(o.filepath, o.content);
-        });
+		layerConfig.pluginsFiles.forEach(function (o) {
+			grunt.file.write(o.filepath, o.content);
+		});
 
-        forEachModules(modules, layerName, function (module) {
-            buffer += module.content + ";";
-        });
+		forEachModules(layerConfig.modules, layerName, function (module) {
+			buffer += module.content + ";";
+		});
 
-        grunt.file.write(layerPath, buffer);
-        grunt.log.write("Writing the layer " + layerPath + "...").ok();
-    });
+		grunt.file.write(layerConfig.outputPath, buffer);
+		grunt.log.write("Writing the layer " + layerConfig.outputPath + "...").ok();
+	});
 };

@@ -25,6 +25,7 @@ module.exports = function (grunt) {
                 config: ".jshintrc",
                 js: {
                     jslintHappy: true,
+					indentWithTabs: true
                 }
             }
         }
