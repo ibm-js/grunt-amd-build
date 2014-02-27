@@ -29,8 +29,7 @@ module.exports = function (grunt) {
 				exports: true,
 				module: true
 			},
-			current,
-
+			
 			fileExists = function (path) {
 				if (!grunt.file.exists(path)) {
 					grunt.fail.warn('Source file "' + path + '" not found.');
@@ -90,9 +89,10 @@ module.exports = function (grunt) {
 			task = function (req) {
 				req(["parse", "transform"], function (parse, transform) {
 					var toTransport = function (moduleName, filepath) {
-						var content = grunt.file.read(current.filepath);
-						return transform.toTransport(null, moduleName, filepath, content);
-					};
+							var content = grunt.file.read(filepath); // Changed something here test
+							return transform.toTransport(null, moduleName, filepath, content);
+						},
+						current;
 
 					grunt.log.subhead("Starting to process layer: " + layerName);
 					grunt.log.writeln("Looking for " + layerName + " dependencies...");
