@@ -29,7 +29,7 @@ module.exports = function (grunt) {
 				exports: true,
 				module: true
 			},
-			
+
 			fileExists = function (path) {
 				if (!grunt.file.exists(path)) {
 					grunt.fail.warn('Source file "' + path + '" not found.');
@@ -54,6 +54,15 @@ module.exports = function (grunt) {
 				includeList.push(module);
 			},
 			getModuleFromMid = function (current) {
+				var normalizePluginResource = function (pluginName, resource) {
+					var plugin = requirejs(pluginName);
+					if (plugin.normalize) {
+						return plugin.normalize(resource, getNormalize(current));
+					} else {
+						return utils.normalize(resource, current, true);
+					}	
+				};
+								
 				return function (mid) {
 					var resource,
 						index = mid.indexOf('!');
@@ -66,7 +75,8 @@ module.exports = function (grunt) {
 
 					mid = utils.normalize(mid, current, true);
 
-					if (resource) {
+					if (resource && buildConfig.runtimePlugins.indexOf(mid) === -1) {
+						resource = normalizePluginResource(mid, resource);
 						if (!plugins[mid]) {
 							plugins[mid] = [];
 						}
@@ -89,8 +99,8 @@ module.exports = function (grunt) {
 			task = function (req) {
 				req(["parse", "transform"], function (parse, transform) {
 					var toTransport = function (moduleName, filepath) {
-							var content = grunt.file.read(filepath); // Changed something here test
-							return transform.toTransport(null, moduleName, filepath, content);
+							var content = grunt.file.read(filepath); 
+						return transform.toTransport(null, moduleName, filepath, content);
 						},
 						current;
 
@@ -139,7 +149,8 @@ module.exports = function (grunt) {
 					done(true);
 				});
 			};
-
+		
+		requirejs.config(grunt.config(loaderCfg));
 		requirejs.tools.useLib(task);
 	});
 };

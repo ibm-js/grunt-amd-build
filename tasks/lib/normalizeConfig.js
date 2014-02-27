@@ -11,7 +11,8 @@ module.exports = (function () {
 		buildDefault = {
 			dir: "dist/",
 			layers: {},
-			pluginFiles: []
+			pluginFiles: [],
+			runtimePlugins: []
 		},
 
 		addTrailingSlash = function (string) {

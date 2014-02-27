@@ -1,23 +1,23 @@
 {
   "name": "grunt-amd-build",
   "description": "EXPERIMENTAL - Grunt plugin to build AMD applications.",
-  "version": "0.3.2",
-  "homepage": "https://github.com/ibm-dojo/grunt-amd-build",
+  "version": "0.4.0",
+  "homepage": "https://github.com/ibm-js/grunt-amd-build",
   "author": {
     "name": "Clément Mathieu",
     "email": "clement.mathieu@outlook.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ibm-dojo/grunt-amd-build.git"
+    "url": "git://github.com/ibm-js/grunt-amd-build.git"
   },
   "bugs": {
-    "url": "https://github.com/ibm-dojo/grunt-amd-build/issues"
+    "url": "https://github.com/ibm-js/grunt-amd-build/issues"
   },
   "licenses": [
     {
       "type": "BSD",
-      "url": "https://github.com/ibm-dojo/grunt-amd-build/blob/master/LICENSE"
+      "url": "https://github.com/ibm-js/grunt-amd-build/blob/master/LICENSE"
     }
   ],
   "main": "Gruntfile.js",
@@ -35,8 +35,7 @@
     "grunt": "~0.4.1"
   },
   "dependencies": {
-    "esprima": "~1.0.4",
-	"requirejs": "~2.1.9"
+    "requirejs": "~2.1.9"
   },
   "keywords": [
     "gruntplugin"
