@@ -60,9 +60,9 @@ module.exports = function (grunt) {
 						return plugin.normalize(resource, getNormalize(current));
 					} else {
 						return utils.normalize(resource, current, true);
-					}	
+					}
 				};
-								
+
 				return function (mid) {
 					var resource,
 						index = mid.indexOf('!');
@@ -99,9 +99,9 @@ module.exports = function (grunt) {
 			task = function (req) {
 				req(["parse", "transform"], function (parse, transform) {
 					var toTransport = function (moduleName, filepath) {
-							var content = grunt.file.read(filepath); 
+						var content = grunt.file.read(filepath);
 						return transform.toTransport(null, moduleName, filepath, content);
-						},
+					},
 						current;
 
 					grunt.log.subhead("Starting to process layer: " + layerName);
@@ -149,7 +149,7 @@ module.exports = function (grunt) {
 					done(true);
 				});
 			};
-		
+
 		requirejs.config(grunt.config(loaderCfg));
 		requirejs.tools.useLib(task);
 	});
