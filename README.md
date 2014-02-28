@@ -27,10 +27,9 @@ In your project's Gruntfile, add a section named `amdBuild` to the data object p
 
 ```js
 grunt.initConfig({
-	amdBuild: {
+	// Build configuration.
+	amdLoader: {
 		baseUrl: "./",
-		dir: "dist",
-		optimize: "none",
 		packages: [{
 			name: "myapp",
 			location: "myapp"
@@ -38,19 +37,41 @@ grunt.initConfig({
 			name: "mypackage",
 			location: "mylocalpackage"
 		}],
-
+		
 		map: {
 			"mypackage/foo": {
 				"mypackage/bar": "bar-mapped"
 			}
 		},
 
-		paths: { "mypackage/foo": "patch/foo"},
+		paths: {
+			"mypackage/foo": "patch/foo",
+		}
+	
+	},
+	
+	amdBuild: {
+		dir: "dist/",
+		
+		runtimePlugins: [
+			"text"
+		],
 		
 		layers: {
-			"myapp/src": {}
-		}		
+			"myapp/src": {
+				
+			}
+		}
 	},
+
+	amdPlugins: {
+		text: {
+			inlineText: true
+		}, 
+		i18n: {
+			localesList: ["fr"]
+		}
+	}
 })
 ```
 

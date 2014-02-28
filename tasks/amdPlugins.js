@@ -49,32 +49,13 @@ module.exports = function (grunt) {
 						writeFile(filepath, content);
 					};
 
-					if (pluginConfig.runtimePlugins) {
-						eachProp(plugins, function (pluginName, resources) {
-							if (pluginConfig.runtimePlugins.indexOf(pluginName) === -1) {
-								filteredPlugins[pluginName] = resources;
-							}
-						});
-						plugins = filteredPlugins;
-					}
-
 					eachProp(plugins, function (pluginName, resources) {
-						var plugin = requirejs(pluginName),
-							normalizedresources;
-
+						var plugin = requirejs(pluginName);
+						
+						requirejs.config(pluginConfig[pluginName] || {});
+						
 						if (plugin.pluginBuilder) {
 							plugin = requirejs(normalize(plugin.pluginBuilder, pluginName));
-						}
-
-
-						if (plugin.normalize) {
-							normalizedresources = resources.map(function (resource) {
-								return plugin.normalize(resource, normalize);
-							});
-						} else {
-							normalizedresources = resources.map(function (resource) {
-								return normalize(resource, null);
-							});
 						}
 
 						resources.forEach(function (resource) {
@@ -111,8 +92,8 @@ module.exports = function (grunt) {
 			isBuild: true
 		});
 		requirejs.config(loaderConfig);
-		requirejs.config(pluginConfig);
-
+		requirejs.config({config: pluginConfig});
+						
 		requirejs.tools.useLib(task);
 	});
 
