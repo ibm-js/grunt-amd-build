@@ -1,15 +1,16 @@
 "use strict";
 
 module.exports = function (grunt) {
-	var allFiles = [
-		"Gruntfile.js",
+	var filesList = [
+		"*.js",
+		"*.json",
 		"tasks/**/*.js"
 	];
 
 	// Project configuration.
 	grunt.initConfig({
 		jshint: {
-			all: allFiles,
+			all: filesList,
 			options: {
 				jshintrc: ".jshintrc",
 			},
@@ -22,13 +23,13 @@ module.exports = function (grunt) {
 					overwrite: true
 				},
 				files: {
-					'': allFiles
+					'': filesList
 				}
 			}
 		},
 
 		jsbeautifier: {
-			files: allFiles,
+			files: filesList,
 			options: {
 				config: ".jshintrc",
 				js: {

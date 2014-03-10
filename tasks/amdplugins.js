@@ -20,22 +20,20 @@ module.exports = function (grunt) {
 				layerConfig.header += content;
 			},
 			writeFile = function (filepath, content) {
-				var o = {
-					filepath: buildConfig.dir + filepath,
-					content: content
-				};
-				layerConfig.pluginsFiles.push(o);
+				var pluginsFiles = layerConfig.pluginsFiles;
+
+				filepath = buildConfig.dir + filepath;
+				pluginsFiles[filepath] = (pluginsFiles[filepath] || "") + content;
 			},
 			normalize = function (mid, current) {
 				return utils.normalize(mid, current, true);
 			},
 			task = function (req) {
 				req(["transform"], function (transform) {
-					var filteredPlugins = {},
-						toTransport = function (moduleName, content) {
-							var filepath = utils.nameToFilepath(moduleName);
-							return transform.toTransport(null, moduleName, filepath, content);
-						};
+					var toTransport = function (moduleName, content) {
+						var filepath = utils.nameToFilepath(moduleName);
+						return transform.toTransport(null, moduleName, filepath, content);
+					};
 
 					write.asModule = function (moduleName, content) {
 						content = toTransport(moduleName, content);
@@ -51,9 +49,9 @@ module.exports = function (grunt) {
 
 					eachProp(plugins, function (pluginName, resources) {
 						var plugin = requirejs(pluginName);
-						
+
 						requirejs.config(pluginConfig[pluginName] || {});
-						
+
 						if (plugin.pluginBuilder) {
 							plugin = requirejs(normalize(plugin.pluginBuilder, pluginName));
 						}
@@ -92,8 +90,10 @@ module.exports = function (grunt) {
 			isBuild: true
 		});
 		requirejs.config(loaderConfig);
-		requirejs.config({config: pluginConfig});
-						
+		requirejs.config({
+			config: pluginConfig
+		});
+
 		requirejs.tools.useLib(task);
 	});
 

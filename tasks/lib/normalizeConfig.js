@@ -9,17 +9,35 @@ module.exports = (function () {
 			paths: {}
 		},
 		buildDefault = {
-			dir: "dist/",
+			dir: "./dist/",
 			layers: {},
-			pluginFiles: [],
 			runtimePlugins: []
 		},
+		layerDefault = {
+			include: [],
+			exclude: [],
+			header: "",
+			modules: {},
+			plugins: {},
+			pluginsFiles: {}
+		},
 
-		addTrailingSlash = function (string) {
-			if (string.charAt(string.length - 1) !== "/") {
-				return string + "/";
+		mixin = function (target, source) {
+			eachProp(source, function (prop, value) {
+				if (!target[prop]) {
+					target[prop] = value;
+				}
+			});
+		},
+
+		normalizeUrl = function (string) {
+			var url = string.replace(/\\/g, "/"),
+				lastChar = url.charAt(url.length - 1);
+
+			if (lastChar !== "/") {
+				return url + "/";
 			}
-			return string;
+			return url;
 		};
 
 	return {
@@ -30,31 +48,28 @@ module.exports = (function () {
 			}
 
 			//Merge with default
-			eachProp(config, function (prop, value) {
-				if (!value && loaderDefault[prop]) {
-					value = loaderDefault[prop];
-				}
-			});
+			mixin(config, loaderDefault);
 
 			//Make sure the baseUrl ends in a slash.
-			config.baseUrl = addTrailingSlash(config.baseUrl);
+			config.baseUrl = normalizeUrl(config.baseUrl);
 
-			//Adjust packages if necessary.
-			if (config.packages) {
-				config.pkgs = {};
+			//Adjust packages`
+			config.pkgs = {};
 
-				config.packages.forEach(function (pkg) {
-					pkg = typeof pkg === "string" ? {
-						name: pkg
-					} : pkg;
+			config.packages.forEach(function (pkg) {
+				pkg = typeof pkg === "string" ? {
+					name: pkg
+				} : pkg;
 
+				if (pkg.name) {
 					config.pkgs[pkg.name] = {
 						name: pkg.name,
 						location: pkg.location || pkg.name,
 						main: pkg.main || "main"
 					};
-				});
-			}
+				}
+			});
+
 
 			config._normalized = true;
 
@@ -68,30 +83,18 @@ module.exports = (function () {
 			}
 
 			//Merge with default
-			eachProp(config, function (prop, value) {
-				if (!value && buildDefault[prop]) {
-					value = buildDefault[prop];
-				}
-			});
+			mixin(config, buildDefault);
 
 			//Make sure the output directory ends in a slash.
-			config.dir = addTrailingSlash(config.dir);
+			config.dir = normalizeUrl(config.dir);
 
 			eachProp(config.layers, function (layerName, layerObj) {
-				var exclude = (layerObj.exclude || []),
-					include = (layerObj.include || []).slice(0);
-				if (include.indexOf(layerName) < 0) {
-					include.push(layerName);
+				mixin(layerObj, layerDefault);
+
+				if (layerObj.include.indexOf(layerName) < 0) {
+					layerObj.include.push(layerName);
 				}
-				config.layers[layerName] = {
-					include: include,
-					exclude: exclude,
-					outputPath: config.dir + layerName + ".js",
-					header: layerObj.header || "",
-					modules: {},
-					plugins: {},
-					pluginsFiles: []
-				};
+				layerObj.outputPath = config.dir + layerName + ".js";
 			});
 
 			config._normalized = true;
