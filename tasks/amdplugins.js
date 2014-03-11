@@ -7,7 +7,7 @@ module.exports = function (grunt) {
 		getUtils = require(libDir + "utils"),
 		requirejs = require("requirejs");
 
-	grunt.registerTask("amdPlugins", function (layerName, buildCfg, loaderCfg) {
+	grunt.registerTask("amdplugins", function (layerName, buildCfg, loaderCfg) {
 		var done = this.async(),
 			pluginConfig = grunt.config(this.name) || {},
 			loaderConfig = grunt.config(loaderCfg),
@@ -60,10 +60,10 @@ module.exports = function (grunt) {
 							requirejs(pluginName + "!" + resource);
 
 							if (plugin.write) {
-								plugin.write(pluginName, resource, write);
+								plugin.write(pluginName, resource, write, {});
 							}
 							if (plugin.writeFile) {
-								plugin.writeFile(pluginName, resource, requirejs, writeFile);
+								plugin.writeFile(pluginName, resource, requirejs, writeFile, {});
 							}
 						});
 

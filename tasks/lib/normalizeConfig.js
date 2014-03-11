@@ -9,7 +9,7 @@ module.exports = (function () {
 			paths: {}
 		},
 		buildDefault = {
-			dir: "./dist/",
+			dir: "./tmp/",
 			layers: {},
 			runtimePlugins: []
 		},

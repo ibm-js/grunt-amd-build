@@ -6,27 +6,38 @@ module.exports = function (grunt) {
 		lang = require(libDir + "lang"),
 		normalizeCfg = require(libDir + "normalizeConfig");
 
-	grunt.registerTask("amdSerialize", function (layerName, buildCfg, output) {
+	grunt.registerTask("amdserialize", function (layerName, buildCfg, outputProp) {
 		var buildConfig = normalizeCfg.build(grunt.config(buildCfg)),
 			layerConfig = buildConfig.layers[layerName],
 			dir = buildConfig.dir,
-			modulesFiles = [],
-			pluginsFiles = [];
+			modulesFiles = {
+				abs: [],
+				rel: []
+			},
+			pluginsFiles = {
+				abs: [],
+				rel: []
+			};
 
 		lang.forEachModules(layerConfig.modules, layerName, function (module) {
 			var path = dir + module.mid + ".js";
 			grunt.file.write(path, module.content);
-			modulesFiles.push(path);
+			modulesFiles.abs.push(path);
+			modulesFiles.rel.push(module.mid + ".js");
 		});
 
 		lang.eachProp(layerConfig.pluginsFiles, function (filepath, content) {
 			grunt.file.write(filepath, content);
-			pluginsFiles.push(filepath);
+			pluginsFiles.abs.push(filepath);
+			pluginsFiles.rel.push(filepath.replace(new RegExp("^(?:.\/)?" + dir), ""));
 		});
 
-		grunt.config([output, "header"], layerConfig.header);
-		grunt.config([output, "modules"], modulesFiles);
-		grunt.config([output, "plugins"], pluginsFiles);
-		grunt.config([output, "layer"], layerName);
+		outputProp = outputProp || "amdoutput";
+
+		grunt.config([outputProp, "header"], layerConfig.header);
+		grunt.config([outputProp, "modules"], modulesFiles);
+		grunt.config([outputProp, "plugins"], pluginsFiles);
+		grunt.config([outputProp, "layer"], layerName);
+		grunt.config([outputProp, "dir"], dir);
 	});
 };

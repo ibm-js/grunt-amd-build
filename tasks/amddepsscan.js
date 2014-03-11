@@ -16,7 +16,7 @@ module.exports = function (grunt) {
 
 
 
-	grunt.registerTask("depsScan", function (layerName, buildCfg, loaderCfg) {
+	grunt.registerTask("amddepsscan", function (layerName, buildCfg, loaderCfg) {
 		var done = this.async(),
 			utils = getUtils(grunt.config(loaderCfg)),
 			buildConfig = normalizeCfg.build(grunt.config(buildCfg)),
