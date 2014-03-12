@@ -34,6 +34,9 @@ module.exports = function (grunt) {
 
 		outputProp = outputProp || "amdoutput";
 
+		// Reset output
+		grunt.config(outputProp, {});
+		
 		grunt.config([outputProp, "header"], layerConfig.header);
 		grunt.config([outputProp, "modules"], modulesFiles);
 		grunt.config([outputProp, "plugins"], pluginsFiles);

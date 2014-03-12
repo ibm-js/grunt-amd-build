@@ -2,24 +2,30 @@ module.exports = (function () {
 	"use strict";
 
 	var eachProp = require("./lang").eachProp,
-		loaderDefault = {
-			baseUrl: "./",
-			packages: [],
-			map: {},
-			paths: {}
+		getLoaderDefault = function () {
+			return {
+				baseUrl: "./",
+				packages: [],
+				map: {},
+				paths: {}
+			};
 		},
-		buildDefault = {
-			dir: "./tmp/",
-			layers: {},
-			runtimePlugins: []
+		getBuildDefault = function () {
+			return {
+				dir: "./tmp/",
+				layers: {},
+				runtimePlugins: []
+			};
 		},
-		layerDefault = {
-			include: [],
-			exclude: [],
-			header: "",
-			modules: {},
-			plugins: {},
-			pluginsFiles: {}
+		getLayerDefault = function () {
+			return {
+				include: [],
+				exclude: [],
+				header: "",
+				modules: {},
+				plugins: {},
+				pluginsFiles: {}
+			};
 		},
 
 		mixin = function (target, source) {
@@ -48,7 +54,7 @@ module.exports = (function () {
 			}
 
 			//Merge with default
-			mixin(config, loaderDefault);
+			mixin(config, getLoaderDefault());
 
 			//Make sure the baseUrl ends in a slash.
 			config.baseUrl = normalizeUrl(config.baseUrl);
@@ -83,13 +89,13 @@ module.exports = (function () {
 			}
 
 			//Merge with default
-			mixin(config, buildDefault);
+			mixin(config, getBuildDefault());
 
 			//Make sure the output directory ends in a slash.
 			config.dir = normalizeUrl(config.dir);
 
 			eachProp(config.layers, function (layerName, layerObj) {
-				mixin(layerObj, layerDefault);
+				mixin(layerObj, getLayerDefault());
 
 				if (layerObj.include.indexOf(layerName) < 0) {
 					layerObj.include.push(layerName);
