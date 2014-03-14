@@ -36,11 +36,10 @@ module.exports = function (grunt) {
 
 		// Reset output
 		grunt.config(outputProp, {});
-		
+
 		grunt.config([outputProp, "header"], layerConfig.header);
 		grunt.config([outputProp, "modules"], modulesFiles);
 		grunt.config([outputProp, "plugins"], pluginsFiles);
 		grunt.config([outputProp, "layer"], layerName);
-		grunt.config([outputProp, "dir"], dir);
 	});
 };
