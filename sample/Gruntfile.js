@@ -26,16 +26,15 @@ module.exports = function (grunt) {
 			runtimePlugins: [],
 
 			// List of layers to build.
-			layers: {
-				"layerName": {
-					include: [
-						// Packages listed here will be added to the layer.
-					],
-					exclude: [
-						// Packages listed here will NOT be in the layer.
-					]
-				}
-			}
+			layers: [{
+				name: "layerName",
+				include: [
+					// Packages listed here will be added to the layer.
+				],
+				exclude: [
+					// Packages listed here will NOT be in the layer.
+				]
+			}]
 		},
 
 		// Here goes the config for the amd plugins build process.
@@ -80,21 +79,15 @@ module.exports = function (grunt) {
 	// The main build task.
 	grunt.registerTask("amdbuild", function (amdloader) {
 		var name = this.name,
-			layers = grunt.config(name).layers, // Read the "amdbuild" config property.
-			layer;
+			layers = grunt.config(name).layers;
 
-		// Clean previous build output.
-		grunt.task.run("clean:erase");
-
-		// Run all the tasks for all the layer with the right arguments.
-		for (layer in layers) {
-			grunt.task.run("amddepsscan:" + layer + ":" + name + ":" + amdloader);
-			grunt.task.run("amdplugins:" + layer + ":" + name + ":" + amdloader);
-			grunt.task.run("amdserialize:" + layer + ":" + name + ":" + outprop);
-			grunt.task.run("uglify");
+		layers.forEach(function (layer) {
+			grunt.task.run("amddepsscan:" + layer.name + ":" + name + ":" + amdloader);
+			grunt.task.run("amdplugins:" + layer.name + ":" + name + ":" + amdloader);
+			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + outprop);
+			grunt.task.run("concat");
 			grunt.task.run("copy");
-			grunt.task.run("clean:finish");
-		}
+		});
 	});
 
 
@@ -102,10 +95,10 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-amd-build");
 
 	// Load vendor plugins.
-	grunt.loadNpmTasks("grunt-contrib-uglify");
+	grunt.loadNpmTasks("grunt-contrib-concat");
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
 	// Default task.
-	grunt.registerTask("default", ["amdbuild:amdloader"]);
+	grunt.registerTask("default", ["clean:erase", , "amdbuild:amdloader", "clean:finish"]);
 };

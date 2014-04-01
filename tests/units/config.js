@@ -56,14 +56,14 @@ define([
 			assert.isObject(config.map, "map should be initialized like {}");
 			
 			config = normalizeConfig.loader({map: {"could": "be any string"}});
-			assert.strictEqual(config.map["could"], "be any string", "map should just be copied");
+			assert.strictEqual(config.map.could, "be any string", "map should just be copied");
 			
 			
 			config = normalizeConfig.loader({});
 			assert.isObject(config.paths, "paths should be initialized like {}");
 			
 			config = normalizeConfig.loader({paths: {"could": "be any string"}});
-			assert.strictEqual(config.paths["could"], "be any string", "paths should just be copied");
+			assert.strictEqual(config.paths.could, "be any string", "paths should just be copied");
 			
 		}
     });
@@ -84,30 +84,30 @@ define([
 		
 		'layers': function () {
 			config = normalizeConfig.build({});
-			assert.isObject(config.layers, "empty config should generate an object");
+			assert.isArray(config.layers, "empty config should generate an array");
 			
-			config = normalizeConfig.build({layers: {testlay: {}}});
-			assert.isArray(config.layers.testlay.exclude, "empty config should generate exclude array");
-			assert.isArray(config.layers.testlay.include, "empty config should generate include array");
-			assert.strictEqual(config.layers.testlay.include[0], "testlay", "The layer name should be included");
-			assert.strictEqual(config.layers.testlay.outputPath, "./tmp/testlay.js", "default outputPath is default dir + layer name + .js");
-			assert.strictEqual(config.layers.testlay.header, "", "default header is empty");
-			assert.isObject(config.layers.testlay.modules, "modules should be initialized as an empty object");
-			assert.isObject(config.layers.testlay.plugins, "plugins should be initialized as an empty object");
-			assert.isObject(config.layers.testlay.pluginsFiles, "pluginsFiles should be initialized as an empty object");
+			config = normalizeConfig.build({layers: [{name: "testlay"}]});
+			assert.isArray(config.layers[0].exclude, "empty config should generate exclude array");
+			assert.isArray(config.layers[0].include, "empty config should generate include array");
+			assert.strictEqual(config.layers[0].outputPath, "./tmp/testlay.js", "default outputPath is default dir + layer name + .js");
+			assert.strictEqual(config.layers[0].header, "", "default header is empty");
+			assert.isObject(config.layers[0].modules, "modules should be initialized as an empty object");
+			assert.isObject(config.layers[0].plugins, "plugins should be initialized as an empty object");
+			assert.isObject(config.layers[0].pluginsFiles, "pluginsFiles should be initialized as an empty object");
+			assert.isObject(config.layersByName, "There should be an object mapping the layers by name");
+			assert.isObject(config.layersByName.testlay, "layers by name map should contain testlay");
 
-			config = normalizeConfig.build({layers: {testlay: {include: ["testinc"]}}});
-			assert.strictEqual(config.layers.testlay.include[0], "testinc", "include should not be overwritten");
-			assert.strictEqual(config.layers.testlay.include[1], "testlay", "include should contain the layer name");
+			config = normalizeConfig.build({layers: [{name: "testlay", include: ["testinc"]}]});
+			assert.strictEqual(config.layers[0].include[0], "testinc", "include should not be overwritten");
 			
-			config = normalizeConfig.build({layers: {testlay: {exclude: ["testex"]}}});
-			assert.strictEqual(config.layers.testlay.exclude[0], "testex", "exclude should not be overwritten");
+			config = normalizeConfig.build({layers: [{name: "testlay", exclude: ["testex"]}]});
+			assert.strictEqual(config.layers[0].exclude[0], "testex", "exclude should not be overwritten");
 
-			config = normalizeConfig.build({layers: {testlay: {}}, dir: "testdir"});
-			assert.strictEqual(config.layers.testlay.outputPath, "testdir/testlay.js", "the outputPath is dir+layername+.js");
+			config = normalizeConfig.build({layers:[{name: "testlay"}], dir: "testdir"});
+			assert.strictEqual(config.layers[0].outputPath, "testdir/testlay.js", "the outputPath is dir+layername+.js");
 			
-			config = normalizeConfig.build({layers: {testlay: {header: "testhead"}}});
-			assert.strictEqual(config.layers.testlay.header, "testhead", "the header should not be overwritten");
+			config = normalizeConfig.build({layers: [{name: "testlay", header: "testhead"}]});
+			assert.strictEqual(config.layers[0].header, "testhead", "the header should not be overwritten");
 		},
 		'runtimePlugins': function () {
 			config = normalizeConfig.build({});

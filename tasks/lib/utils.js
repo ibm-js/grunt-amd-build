@@ -1,4 +1,5 @@
-/* jshint -W074 */
+/* Most of this code is from require.js so higher complexity is allowed. */
+/* jshint maxcomplexity:20 */
 
 module.exports = function (cfg) {
 	"use strict";

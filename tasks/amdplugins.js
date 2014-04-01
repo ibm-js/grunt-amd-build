@@ -13,7 +13,7 @@ module.exports = function (grunt) {
 			loaderConfig = grunt.config(loaderCfg),
 			utils = getUtils(loaderConfig),
 			buildConfig = normalizeCfg.build(grunt.config(buildCfg)),
-			layerConfig = buildConfig.layers[layerName],
+			layerConfig = buildConfig.layersByName[layerName],
 			plugins = layerConfig.plugins,
 
 			write = function (content) {
@@ -39,7 +39,8 @@ module.exports = function (grunt) {
 						content = toTransport(moduleName, content);
 						layerConfig.modules[moduleName] = {
 							mid: moduleName,
-							content: content
+							content: content,
+							filepath: utils.nameToFilepath(moduleName)
 						};
 					};
 					writeFile.asModule = function (moduleName, filepath, content) {

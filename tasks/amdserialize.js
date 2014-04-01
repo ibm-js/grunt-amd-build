@@ -8,7 +8,7 @@ module.exports = function (grunt) {
 
 	grunt.registerTask("amdserialize", function (layerName, buildCfg, outputProp) {
 		var buildConfig = normalizeCfg.build(grunt.config(buildCfg)),
-			layerConfig = buildConfig.layers[layerName],
+			layerConfig = buildConfig.layersByName[layerName],
 			dir = buildConfig.dir,
 			modulesFiles = {
 				abs: [],
@@ -20,7 +20,7 @@ module.exports = function (grunt) {
 			};
 
 		lang.forEachModules(layerConfig.modules, layerName, function (module) {
-			var path = dir + module.mid + ".js";
+			var path = dir + module.filepath;
 			grunt.file.write(path, module.content);
 			modulesFiles.abs.push(path);
 			modulesFiles.rel.push(module.mid + ".js");
@@ -40,6 +40,7 @@ module.exports = function (grunt) {
 		grunt.config([outputProp, "header"], layerConfig.header);
 		grunt.config([outputProp, "modules"], modulesFiles);
 		grunt.config([outputProp, "plugins"], pluginsFiles);
-		grunt.config([outputProp, "layer"], layerName);
+		grunt.config([outputProp, "layerName"], layerName);
+		grunt.config([outputProp, "layerPath"], layerConfig.outputPath);
 	});
 };

@@ -13,7 +13,8 @@ module.exports = (function () {
 		getBuildDefault = function () {
 			return {
 				dir: "./tmp/",
-				layers: {},
+				layers: [],
+				layersByName: {},
 				runtimePlugins: []
 			};
 		},
@@ -94,13 +95,13 @@ module.exports = (function () {
 			//Make sure the output directory ends in a slash.
 			config.dir = normalizeUrl(config.dir);
 
-			eachProp(config.layers, function (layerName, layerObj) {
-				mixin(layerObj, getLayerDefault());
-
-				if (layerObj.include.indexOf(layerName) < 0) {
-					layerObj.include.push(layerName);
+			config.layers.forEach(function (layer) {
+				if (!layer.name) {
+					throw new Error("A layer name is required.");
 				}
-				layerObj.outputPath = config.dir + layerName + ".js";
+				mixin(layer, getLayerDefault());
+
+				config.layersByName[layer.name] = layer;
 			});
 
 			config._normalized = true;
