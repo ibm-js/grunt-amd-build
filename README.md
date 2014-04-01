@@ -30,7 +30,7 @@ Those tasks need to be run for each layer. A helper task can be used to do that 
 
 ## Configuration
 
-The build config is splitted into three propoperties:
+The build config is split into three properties:
 * `amdloader`: contains the amd loader config. You can find the documentation [here](http://requirejs.org/docs/api.html#config) for RequireJS.
 * `amdbuild`: contains the build configuration (mainly the output directory and the list of layers). This property is shared between the tasks and each tasks add its result to the corresponding layer object.
 * `amdplugins`: contains the configuration for the plugin dependencies that will be processed at build time.
@@ -88,7 +88,7 @@ The `outputProp` will contain the following object :
 
 ## Use Uglify
 The provided tasks are not writing the layer but the task `grunt-contrib-uglify` will do it. 
-Using the data outputed by `amdserialize` the Uglify task can be configured properly.
+Using the data output by `amdserialize` the Uglify task can be configured properly.
 
 ```js
 // Config to allow uglify to generate the layer.
