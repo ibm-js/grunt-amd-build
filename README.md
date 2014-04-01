@@ -21,7 +21,11 @@ grunt.loadNpmTasks('grunt-amd-build');
 ```
 
 ## Overview
-This plugin provides three  grunt tasks:
+The goal of this plugin is to provide a modular build system for AMD applications. This will allow more flexibility than previous monolithic system like r.js and the Dojo build system.
+
+To do so, this plugin focuses on specific tasks, like gathering all the dependencies of a layer, and delegate to other plugins the more general tasks like concatenation or uglification.
+
+Currently there is three grunt tasks in the plugin:
 * `amddepsscan`: explore your application to get all the dependencies to include in a layer.
 * `amdplugins`: process the plugins dependencies found by `amddepsscan` according to the spec defined by [require.js](http://requirejs.org/docs/plugins.html).
 * `amdserialize`: output the processed files in a directory and make the list of files available in grunt config so they can be uglified or concatenated.
