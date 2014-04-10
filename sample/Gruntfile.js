@@ -47,14 +47,14 @@ module.exports = function (grunt) {
 			}
 		},
 
-		// Config to allow uglify to generate the layer.
-		uglify: {
+		// Config to allow concat to generate the layer.
+		concat: {
 			options: {
 				banner: "<%= " + outprop + ".header%>"
 			},
 			dist: {
 				src: "<%= " + outprop + ".modules.abs %>",
-				dest: outdir + "<%= " + outprop + ".layer %>.js"
+				dest: "<%= " + outprop + ".layerPath %>"
 			}
 		},
 
@@ -100,5 +100,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
 	// Default task.
-	grunt.registerTask("default", ["clean:erase", , "amdbuild:amdloader", "clean:finish"]);
+	grunt.registerTask("default", ["clean:erase", "amdbuild:amdloader", "clean:finish"]);
 };

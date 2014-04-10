@@ -232,7 +232,7 @@ module.exports = function (grunt) {
 					current.content = readFile(current.mid, current.filepath);
 
 					// if content is empty, then something went wrong so skip this module.
-					if (current.content.length > 0) {
+					if (current.content) {
 						current.content = toTransport(current.mid, current.filepath, current.content);
 						var deps = parse.findDependencies(current.mid, current.content)
 							.map(getNormalize(current.mid))

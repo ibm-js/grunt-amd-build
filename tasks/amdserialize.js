@@ -7,19 +7,23 @@ module.exports = function (grunt) {
 		normalizeCfg = require(libDir + "normalizeConfig");
 
 	grunt.registerTask("amdserialize", function (layerName, buildCfg, outputProp) {
-		var buildConfig = normalizeCfg.build(grunt.config(buildCfg)),
-			layerConfig = buildConfig.layersByName[layerName],
-			dir = buildConfig.dir,
-			modulesFiles = {
-				abs: [],
-				rel: []
-			},
-			pluginsFiles = {
-				abs: [],
-				rel: []
-			};
+		var buildConfig = normalizeCfg.build(grunt.config(buildCfg));
+		var	layerConfig = buildConfig.layersByName[layerName];
+		var	dir = buildConfig.dir;
+		var	modulesFiles = {
+			abs: [],
+			rel: []
+		};
+		var	pluginsFiles = {
+			abs: [],
+			rel: []
+		};
 
 		lang.forEachModules(layerConfig.modules, layerName, function (module) {
+			if (!module.filepath) {
+				grunt.fail.warn("Undefined Path " + module.mid);
+			}
+			
 			var path = dir + module.filepath;
 			grunt.file.write(path, module.content);
 			modulesFiles.abs.push(path);

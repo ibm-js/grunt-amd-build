@@ -101,6 +101,9 @@ module.exports = (function () {
 				}
 				mixin(layer, getLayerDefault());
 
+				// Basic output path for the layer.
+				layer.outputPath = layer.name + ".js";
+				
 				config.layersByName[layer.name] = layer;
 			});
 
