@@ -29,10 +29,16 @@ module.exports = function (grunt) {
 			layers: [{
 				name: "layerName",
 				include: [
-					// Packages listed here will be added to the layer.
+					// Modules and layers listed here, and their dependencies, will be added to the layer.
+				],
+				includeShallow: [
+					// Only the modules listed here (ie. NOT their dependencies) will be added to the layer.
 				],
 				exclude: [
-					// Packages listed here will NOT be in the layer.
+					// Modules and layers listed here, and their dependencies, will NOT be in the layer.
+				],
+				excludeShallow: [
+					// Only the modules listed here (ie. NOT their dependencies)  will NOT be in the layer.
 				]
 			}]
 		},
@@ -54,7 +60,7 @@ module.exports = function (grunt) {
 			},
 			dist: {
 				src: "<%= " + outprop + ".modules.abs %>",
-				dest: "<%= " + outprop + ".layerPath %>"
+				dest: outdir + "<%= " + outprop + ".layerPath %>"
 			}
 		},
 

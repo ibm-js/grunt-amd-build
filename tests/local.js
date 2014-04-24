@@ -40,8 +40,8 @@ define({
 	},
 
 	// Non-functional test suite(s) to run in each browser
-	suites: [ "tests/units/config" ],
-	
+	suites: ["tests/units/config", "tests/units/modulesStack", "tests/units/parseExclude", "tests/units/modules"],
+
 	// Functional test suite(s) to run in each browser once non-functional tests are completed
 	// functionalSuites: ['tests/i18nBuilt'],
 

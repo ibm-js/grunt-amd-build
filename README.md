@@ -32,34 +32,125 @@ Currently there is three grunt tasks in the plugin:
 
 Those tasks need to be run for each layer. A helper task can be used to do that automatically (see the task `amdbuild` in the sample [Gruntfile.js](sample/Gruntfile.js))
 
-## Configuration
+## Common configuration
 
-The build config is split into three properties:
+The build config is split into two common properties:
 * `amdloader`: contains the amd loader config. You can find the documentation [here](http://requirejs.org/docs/api.html#config) for RequireJS.
 * `amdbuild`: contains the build configuration (mainly the output directory and the list of layers). This property is shared between the tasks and each tasks add its result to the corresponding layer object.
-* `amdplugins`: contains the configuration for the plugin dependencies that will be processed at build time.
 
 ## Tasks 
 
 ### amddepsscan(layerName, buildConfig, loaderConfig):
-Parse the module(s) to include in the layer to find all their dependencies.
+Parse the module(s) to include in the layer to find all their dependencies and build a plugin resources map to be consumed by the task `amdplugins`. 
+This task should be used when you want to do custom build for an application.
 
 #### Arguments
-1. layerName _(String)_: The layer name. This should be the name of a property in the `buildConfig.layers` object.
+1. layerName _(String)_: The layer name.
 1. buildConfig _(String)_: Name of the property where the build configuration is stored. 
 1. loaderConfig _(String)_: Name of the property where the amd loader configuration is stored. 
 
+#### Task configuration
+This task can be configured with the following properties from the common configuration:
+
+```
+amdbuild: {
+	// List of plugins that the build should not try to resolve at build time.
+	runtimePlugins: [],
+
+	// List of layers to build.
+	layers: [{
+		name: "layerName",
+		include: [
+			// Modules and layers listed here, and their dependencies, will be added to the layer.
+		],
+		includeShallow: [
+			// Only the modules listed here (ie. NOT their dependencies) will be added to the layer.
+		],
+		exclude: [
+			// Modules and layers listed here, and their dependencies, will NOT be in the layer.
+		],
+		excludeShallow: [
+			// Only the modules listed here (ie. NOT their dependencies)  will NOT be in the layer.
+		]
+	}]
+}
+```
+
+* `amdbuild.runtimePlugins` _(Array)_: List of plugin module IDs that can only be resolved at run time. Hence the resources will be ignored, but the plugin itself will be included in the layer.
+
+* `amdbuild.layers[x].name` _(String)_: Module ID of the layer. If the layer module ID is already pointing to a module, that module will be included even if it is not explicitly listed in the `amdbuild.layers[x].include` property. This can be avoided by adding that module ID to the `amdbuild.layers[x].excludeShallow` property.
+
+* `amdbuild.layers[x].include`,  `amdbuild.layers[x].exclude` _(Array)_: List of module IDs to include/exclude in/from the layer. If a module ID represents an actual module, this module and its dependencies will be included/excluded in/from the layer. If a module ID is a layer module ID __previously defined in the `layers` array__, all the modules in that layer will be included/excluded in/from the layer. 
+
+    __Note:__ If a module is a dependency of a included module and of an excluded module, it will be excluded. 
+
+* `amdbuild.layers[x].includeShallow`,  `amdbuild.layers[x].excludeShallow` _(Array)_: List of module IDs to include/exclude in/from the layer. Dpendencies of modules listed here will not be included/excluded in/from the layer.
+
 #### Results
-This task adds the dependencies to the `buildConfig.layers.layerName` object. The modules and the plugins are stored separately, in `buildConfig.layers.layerName.modules` and in `buildConfig.layers.layerName.plugins`.
+This task adds the dependencies to the `buildConfig.layers.layerName` object. The modules and the plugins resources are stored separately, in `buildConfig.layers.layerName.modules` and in `buildConfig.layers.layerName.plugins`.
+
+### amddirscan(layerName, buildConfig, loaderConfig):
+Explore a directory to list all the module to include in the layer and build a plugin resources map to be consumed by the task `amdplugins`. 
+This task should be used when you want to build a library with all the modules in a directory and without external dependencies.
+
+#### Arguments
+1. layerName _(String)_: The layer name.
+1. buildConfig _(String)_: Name of the property where the build configuration is stored. 
+1. loaderConfig _(String)_: Name of the property where the amd loader configuration is stored. For this task, loaderConfig is only used to resolve the plugins.
+
+#### Task configuration
+This task can be configured with the following properties from the common configuration:
+
+```
+amdbuild: {
+	// List of plugins that the build should not try to resolve at build time.
+	runtimePlugins: [],
+
+	// List of layers to build.
+	layers: [{
+		name: "layerName",
+		includeFiles: [
+			// Files in the cwd matching the glob patterns listed here will be added to the layer.
+		],
+		excludeFiles: [
+			// Files in the cwd matching the glob patterns listed here will NOT be in the layer.
+		]
+	}]
+}
+```
+
+* `amdbuild.runtimePlugins` _(Array)_: List of plugin module IDs that can only be resolved at run time. Hence the resources will be ignored and the plugin itself will be included only if it matches a glob patern from `amdbuild.layers[x].includeFiles`.
+
+* `amdbuild.layers[x].name` _(String)_: Module ID of the layer. 
+
+* `amdbuild.layers[x].includeFiles`,  `amdbuild.layers[x].excludeFiles` _(Array)_: List of glob pattern to match files to include/exclude in/from the layer. If a file match an including and an excluding pattern, it will be excluded. 
+
+#### Results
+This task adds the matching files to the `buildConfig.layers.layerName` object. The modules and the plugins resources are stored separately, in `buildConfig.layers.layerName.modules` and in `buildConfig.layers.layerName.plugins`.
+
 
 ### amdplugins(layerName, buildConfig, loaderConfig):
 Build the plugin dependencies using the plugin build functions as described [here](http://requirejs.org/docs/plugins.html).
 This task use the configuration specified in the `amdplugins` property to configure each plugin.
 
 #### Arguments
-1. layerName _(String)_: The layer name. This should be the name of a property in the `buildConfig.layers` object.
+1. layerName _(String)_: The layer name.
 1. buildConfig _(String)_: Name of the property where the build configuration is stored. 
 1. loaderConfig _(String)_: Name of the property where the amd loader configuration is stored. 
+
+#### Task configuration
+This task use its own configuration:
+
+```
+amdplugins: {
+	pluginID : {
+		// Plugin config goes here.
+		...
+	}
+}
+```
+
+* `amdplugins` _(Object)_: Map of plugin configurations. The `amdplugins.pluginID` object will be used as config for the plugin `pluginID`.
 
 #### Results
 The result depends on the plugin being build.
@@ -69,9 +160,12 @@ Write all the files and modules generated by `amddepsscan` and by `amdplugins` t
 Set the `outputProp` with the list of written files.
 
 #### Arguments
-1. layerName _(String)_: The layer name. This should be the name of a property in the `buildConfig.layers` object.
+1. layerName _(String)_: The layer name.
 1. buildConfig _(String)_: Name of the property where the build configuration is stored. 
 1. outputProp _(String)_: Name of the property where the list of generated files will be stored. 
+
+#### Task configuration
+This task does not use grunt configuration.
 
 #### Results
 The `outputProp` will contain the following object : 
@@ -90,22 +184,43 @@ The `outputProp` will contain the following object :
 }
 ```
 
+### amdreportjson(buildConfig):
+Write a JSON file containing the list of included modules by layer. This task should be run last so everything else is done and the layers will not change.
+
+#### Arguments
+1. buildConfig _(String)_: Name of the property where the build configuration is stored. 
+
+#### Task configuration
+This task use its own configuration:
+
+```
+amdreportjson: {
+	dir: "report/"
+}
+```
+
+* `amdreportjson.dir` _(String)_: Directory in which the task will write the resulting file `buildReport.json`.
+
+#### Results
+Write a `buildReport.json` file.
+
 ## Use Uglify
 The provided tasks are not writing the layer but the task `grunt-contrib-uglify` will do it. 
 Using the data output by `amdserialize` the Uglify task can be configured properly.
 
 ```js
-// Config to allow uglify to generate the layer.
+// Config to allow Uglify to generate the layer.
 uglify: {
     options: {
         banner: "<%= " + outprop + ".header%>"
 	},
 	dist: {
 		src: "<%= " + outprop + ".modules.abs %>",
-		dest: outdir + "<%= " + outprop + ".layer %>.js"
+		dest: outdir + "<%= " + outprop + ".layerPath %>"
 	}
 }
 ```
+__Notes:__ If you want to use the __source-map__ option in Uglify, you should keep the output of `amdserialize` in the `buildConfig.dir` directory. Otherwise the original sources will not be found.
 
 ## Copying the plugin files
 The plugin files are in the temp directory so they need to be copied to the final output directory.

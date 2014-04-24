@@ -2,6 +2,8 @@ module.exports = (function () {
 	"use strict";
 
 	var eachProp = require("./lang").eachProp,
+		jsSuffixRegExp = /\.js$/,
+		currDirRegExp = /^\.\//,
 		getLoaderDefault = function () {
 			return {
 				baseUrl: "./",
@@ -21,7 +23,11 @@ module.exports = (function () {
 		getLayerDefault = function () {
 			return {
 				include: [],
+				includeFiles: [],
+				includeShallow: [],
 				exclude: [],
+				excludeFiles: [],
+				excludeShallow: [],
 				header: "",
 				modules: {},
 				plugins: {},
@@ -49,34 +55,46 @@ module.exports = (function () {
 
 	return {
 		loader: function (config) {
-			//Already normalized
+			// Already normalized
 			if (config._normalized) {
 				return config;
 			}
 
-			//Merge with default
+			// Merge with default
 			mixin(config, getLoaderDefault());
 
-			//Make sure the baseUrl ends in a slash.
+			// Make sure the baseUrl ends in a slash.
 			config.baseUrl = normalizeUrl(config.baseUrl);
 
-			//Adjust packages`
+			// Adjust packages`
 			config.pkgs = {};
 
-			config.packages.forEach(function (pkg) {
-				pkg = typeof pkg === "string" ? {
-					name: pkg
-				} : pkg;
+			config.packages.forEach(function (pkgObj) {
+				var location, name;
 
-				if (pkg.name) {
-					config.pkgs[pkg.name] = {
-						name: pkg.name,
-						location: pkg.location || pkg.name,
-						main: pkg.main || "main"
-					};
+				pkgObj = typeof pkgObj === 'string' ? {
+					name: pkgObj
+				} : pkgObj;
+
+				name = pkgObj.name;
+				// Packages must have a name
+				if (name) {
+					location = pkgObj.location;
+					if (location) {
+						config.paths[name] = pkgObj.location;
+					}
+
+					//Save pointer to main module ID for pkg name.
+					//Remove leading dot in main, so main paths are normalized,
+					//and remove any trailing .js, since different package
+					//envs have different conventions: some use a module name,
+					//some use a file name.
+					config.pkgs[name] = pkgObj.name + '/' + (pkgObj.main || 'main')
+						.replace(currDirRegExp, '')
+						.replace(jsSuffixRegExp, '');
+
 				}
 			});
-
 
 			config._normalized = true;
 
@@ -84,15 +102,15 @@ module.exports = (function () {
 		},
 
 		build: function (config) {
-			//Already normalized
+			// Already normalized
 			if (config._normalized) {
 				return config;
 			}
 
-			//Merge with default
+			// Merge with default
 			mixin(config, getBuildDefault());
 
-			//Make sure the output directory ends in a slash.
+			// Make sure the output directory ends in a slash.
 			config.dir = normalizeUrl(config.dir);
 
 			config.layers.forEach(function (layer) {
@@ -103,13 +121,15 @@ module.exports = (function () {
 
 				// Basic output path for the layer.
 				layer.outputPath = layer.name + ".js";
-				
+
 				config.layersByName[layer.name] = layer;
 			});
 
 			config._normalized = true;
 
 			return config;
-		}
+		},
+
+		normalizeUrl: normalizeUrl
 	};
 })();

@@ -6,6 +6,7 @@ module.exports = function (cfg) {
 
 	var config = require("./normalizeConfig").loader(cfg),
 		getOwn = require("./lang").getOwn,
+		jsSuffixRegExp = /\.js$/,
 
 		/**
 		 * Trims the . and .. from an array of path segments.
@@ -16,10 +17,9 @@ module.exports = function (cfg) {
 		 * NOTE: this method MODIFIES the input array.
 		 * @param {Array} ary the array of path segments.
 		 */
-
 		trimDots = function (ary) {
-			var i, part;
-			for (i = 0; ary[i]; i += 1) {
+			var i, part, length = ary.length;
+			for (i = 0; i < length; i++) {
 				part = ary[i];
 				if (part === '.') {
 					ary.splice(i, 1);
@@ -53,16 +53,15 @@ module.exports = function (cfg) {
 		 * only be done if this normalization is for a dependency ID.
 		 * @returns {String} normalized name
 		 */
-
+		/* Remove jshint warning for the bad indentation @l.103 because of the named loop. */
+		/* jshint -W015 */
 		normalize: function (name, baseName, applyMap) {
-			var pkgName, pkgConfig, mapValue, nameParts, i, j, nameSegment,
+			var pkgMain, mapValue, nameParts, i, j, nameSegment, lastIndex,
 				foundMap, foundI, foundStarMap, starI,
-				map = config.map,
-				pkgs = config.pkgs,
 				baseParts = baseName && baseName.split('/'),
 				normalizedBaseParts = baseParts,
+				map = config.map,
 				starMap = map && map['*'];
-
 
 			//Adjust any relative paths.
 			if (name && name.charAt(0) === '.') {
@@ -70,29 +69,26 @@ module.exports = function (cfg) {
 				//otherwise, assume it is a top-level require that will
 				//be relative to baseUrl in the end.
 				if (baseName) {
-					if (getOwn(pkgs, baseName)) {
-						//If the baseName is a package name, then just treat it as one
-						//name to concat the name with.
-						normalizedBaseParts = baseParts = [baseName];
-					} else {
-						//Convert baseName to array, and lop off the last part,
-						//so that . matches that 'directory' and not name of the baseName's
-						//module. For instance, baseName of 'one/two/three', maps to
-						//'one/two/three.js', but we want the directory, 'one/two' for
-						//this normalization.
-						normalizedBaseParts = baseParts.slice(0, baseParts.length - 1);
+					//Convert baseName to array, and lop off the last part,
+					//so that . matches that 'directory' and not name of the baseName's
+					//module. For instance, baseName of 'one/two/three', maps to
+					//'one/two/three.js', but we want the directory, 'one/two' for
+					//this normalization.
+					normalizedBaseParts = baseParts.slice(0, baseParts.length - 1);
+					name = name.split('/');
+					lastIndex = name.length - 1;
+
+					// If wanting node ID compatibility, strip .js from end
+					// of IDs. Have to do this here, and not in nameToUrl
+					// because node allows either .js or non .js to map
+					// to same file.
+					if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
+						name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
 					}
 
-					name = normalizedBaseParts.concat(name.split('/'));
+					name = normalizedBaseParts.concat(name);
 					trimDots(name);
-
-					//Some use of packages may use a . path to reference the
-					//'main' module name, so normalize for that.
-					pkgConfig = getOwn(pkgs, (pkgName = name[0]));
 					name = name.join('/');
-					if (pkgConfig && name === pkgName + '/' + pkgConfig.main) {
-						name = pkgName;
-					}
 				} else if (name.indexOf('./') === 0) {
 					// No baseName, so this is ID is resolved relative
 					// to baseUrl, pull off the leading dot.
@@ -104,7 +100,7 @@ module.exports = function (cfg) {
 			if (applyMap && map && (baseParts || starMap)) {
 				nameParts = name.split('/');
 
-				for (i = nameParts.length; i > 0; i -= 1) {
+				outerLoop: for (i = nameParts.length; i > 0; i -= 1) {
 					nameSegment = nameParts.slice(0, i).join('/');
 
 					if (baseParts) {
@@ -112,23 +108,19 @@ module.exports = function (cfg) {
 						//So, do joins on the biggest to smallest lengths of baseParts.
 						for (j = baseParts.length; j > 0; j -= 1) {
 							mapValue = getOwn(map, baseParts.slice(0, j).join('/'));
+
 							//baseName segment has config, find if it has one for
 							//this name.
 							if (mapValue) {
-
 								mapValue = getOwn(mapValue, nameSegment);
 								if (mapValue) {
 									//Match, update name to the new value.
 									foundMap = mapValue;
 									foundI = i;
-									break;
+									break outerLoop;
 								}
 							}
 						}
-					}
-
-					if (foundMap) {
-						break;
 					}
 
 					//Check for a star map match, but just hold on to it,
@@ -151,23 +143,31 @@ module.exports = function (cfg) {
 				}
 			}
 
-			return name;
+			// If the name points to a package's name, use
+			// the package main instead.
+			pkgMain = getOwn(config.pkgs, name);
+
+			return pkgMain ? pkgMain : name;
 		},
+		/* jshint +W015 */
+		/* Restore jshint warning */
 
 		/**
-		 * Converts a module name to a file path. Supports cases where
-		 * moduleName may actually be just an URL.
+		 * Converts a module name to a file path.
 		 * Note that it **does not** call normalize on the moduleName,
 		 * it is assumed to have already been normalized. This is an
 		 * internal API, not a public one. Use toUrl for the public API.
 		 */
-
 		nameToFilepath: function (moduleName) {
-			var pkg, pkgPath, syms, i, parentModule, url,
+			var paths, syms, i, parentModule, url,
 				parentPath,
-				pkgs = config.pkgs,
-				baseUrl = config.baseUrl,
-				paths = config.paths;
+				pkgMain = getOwn(config.pkgs, moduleName);
+
+			if (pkgMain) {
+				moduleName = pkgMain;
+			}
+
+			paths = config.paths;
 
 			syms = moduleName.split('/');
 			//For each module name segment, see if there is a path
@@ -175,7 +175,7 @@ module.exports = function (cfg) {
 			//and work up from it.
 			for (i = syms.length; i > 0; i -= 1) {
 				parentModule = syms.slice(0, i).join('/');
-				pkg = getOwn(pkgs, parentModule);
+
 				parentPath = getOwn(paths, parentModule);
 				if (parentPath) {
 					//If an array, it means there are a few choices,
@@ -185,27 +185,14 @@ module.exports = function (cfg) {
 					}
 					syms.splice(0, i, parentPath);
 					break;
-				} else if (pkg) {
-					//If module name is just the package name, then looking
-					//for the main module.
-					if (moduleName === pkg.name) {
-						pkgPath = pkg.location + '/' + pkg.main;
-					} else {
-						pkgPath = pkg.location;
-					}
-					syms.splice(0, i, pkgPath);
-					break;
 				}
 			}
 
 			//Join the path parts together, then figure out if baseUrl is needed.
-			url = syms.join('/');
-			url += '.js';
-			url = (url.charAt(0) === '/' || url.match(/^[\w\+\.\-]+:/) ? '' : baseUrl) + url;
+			url = syms.join('/') + '.js';
+			url = (url.charAt(0) === '/' || url.match(/^[\w\+\.\-]+:/) ? '' : config.baseUrl) + url;
 
 			return url;
 		}
-
-
 	};
 };

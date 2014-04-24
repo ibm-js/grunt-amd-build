@@ -8,13 +8,13 @@ module.exports = function (grunt) {
 
 	grunt.registerTask("amdserialize", function (layerName, buildCfg, outputProp) {
 		var buildConfig = normalizeCfg.build(grunt.config(buildCfg));
-		var	layerConfig = buildConfig.layersByName[layerName];
-		var	dir = buildConfig.dir;
-		var	modulesFiles = {
+		var layerConfig = buildConfig.layersByName[layerName];
+		var dir = buildConfig.dir;
+		var modulesFiles = {
 			abs: [],
 			rel: []
 		};
-		var	pluginsFiles = {
+		var pluginsFiles = {
 			abs: [],
 			rel: []
 		};
@@ -23,7 +23,7 @@ module.exports = function (grunt) {
 			if (!module.filepath) {
 				grunt.fail.warn("Undefined Path " + module.mid);
 			}
-			
+
 			var path = dir + module.filepath;
 			grunt.file.write(path, module.content);
 			modulesFiles.abs.push(path);
