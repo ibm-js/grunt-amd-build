@@ -26,7 +26,7 @@ module.exports = function (grunt) {
 		var options = {
 			filter: "isFile"
 		};
-		return grunt.file.expand(options, excludePatterns.concat(patterns));
+		return grunt.file.expand(options, patterns.concat(excludePatterns));
 	}
 
 
@@ -63,7 +63,6 @@ module.exports = function (grunt) {
 							.forEach(function (module) {
 								lib.addPluginResources(module, layerConfig.plugins);
 							});
-						console.log(layerConfig.plugins);
 					}
 				});
 

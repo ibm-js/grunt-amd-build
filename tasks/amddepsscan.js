@@ -99,6 +99,7 @@ module.exports = function (grunt) {
 						current = modulesStack.pop();
 						// if content is empty, then something went wrong so skip this module.
 						if (current.content) {
+							grunt.verbose.writeln(current.mid);
 							current.content = toTransport(current.mid, current.filepath, current.content);
 							if (addDeps) {
 								getDeps(current).filter(pE.isMidToInclude)
@@ -152,6 +153,7 @@ module.exports = function (grunt) {
 				var modulesStack = getStack();
 
 				// Search dependencies
+				grunt.verbose.writeln("Found dependencies for " + layerName);
 				initStack(modulesStack, include, exclude, excludeShallow);
 				processStack(modulesStack, true);
 
@@ -160,11 +162,7 @@ module.exports = function (grunt) {
 				processStack(modulesStack, false);
 
 				//Logging
-				grunt.verbose.or.ok();
-				grunt.verbose.writeln("Found dependencies for " + layerName);
-				eachProp(layerConfig.modules, function (prop, module) {
-					grunt.verbose.writeln(module.mid);
-				});
+				grunt.log.ok();
 
 				//Save modification
 				grunt.config([buildCfg], buildConfig);

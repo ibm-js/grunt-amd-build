@@ -51,11 +51,12 @@ module.exports = function (grunt) {
 					eachProp(plugins, function (pluginName, resources) {
 						var plugin = requirejs(pluginName);
 
-						requirejs.config(pluginConfig[pluginName] || {});
-
 						if (plugin.pluginBuilder) {
-							plugin = requirejs(normalize(plugin.pluginBuilder, pluginName));
+							pluginName = normalize(plugin.pluginBuilder, pluginName)
+							plugin = requirejs(pluginName);
 						}
+
+						requirejs.config(pluginConfig[pluginName] || {});
 
 						resources.forEach(function (resource) {
 							requirejs(pluginName + "!" + resource);
