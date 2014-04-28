@@ -52,7 +52,7 @@ module.exports = function (grunt) {
 						var plugin = requirejs(pluginName);
 
 						if (plugin.pluginBuilder) {
-							pluginName = normalize(plugin.pluginBuilder, pluginName)
+							pluginName = normalize(plugin.pluginBuilder, pluginName);
 							plugin = requirejs(pluginName);
 						}
 
