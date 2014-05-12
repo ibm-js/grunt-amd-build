@@ -1,6 +1,6 @@
 # grunt-amd-build
 
-> EXPERIMENTAL - Grunt plugin to build [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) applications.
+> Grunt plugin to build [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) applications.
 
 ## Warning 
 This plugin only support RequireJS loader and plugins for now. It will not currently work with the Dojo loader or plugins.
