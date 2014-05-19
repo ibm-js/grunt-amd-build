@@ -1,9 +1,21 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern/dojo/node!../../tasks/lib/parseExclude'
-], function (registerSuite, assert, getParseExclude) {
+	'intern/dojo/node!../../tasks/lib/parseExclude',
+	'intern/dojo/node!fs'
+], function (registerSuite, assert, getParseExclude, fs) {
 	var parseExclude;
+
+	function getLayerContent(mid) {
+		var content = "";
+		try {
+			content = fs.readFileSync("./tests/units/" + mid + ".js").toString();
+		} catch (e) {}
+		return {
+			content: content
+		};
+	}
+
 	registerSuite({
 		name: 'parseExclude',
 
@@ -56,9 +68,9 @@ define([
 					}, ]
 				}
 			};
-			var exclude = ["module1", "layerA"];
+			var exclude = ["module1", "layerA", "layers/layer_min"];
 			parseExclude = getParseExclude();
-			exclude = parseExclude.excludeLayerDeps(exclude, layersMap);
+			exclude = parseExclude.excludeLayerDeps(exclude, layersMap, getLayerContent);
 			parseExclude.excludeArray(exclude);
 			assert.isFalse(parseExclude.isMidToInclude("module1"),
 				"specified modules should be excluded");
@@ -70,7 +82,10 @@ define([
 				"not specified modules should not be excluded");
 			assert.isTrue(parseExclude.isMidToInclude("moduleD"),
 				"not specified modules should not be excluded");
-
+			assert.isFalse(parseExclude.isMidToInclude("dojo/string"),
+				"modules in specified layer should be excluded");
+			assert.isFalse(parseExclude.isMidToInclude("dojo/sniff"),
+				"modules in specified layer should be excluded");
 		}
 	});
 });

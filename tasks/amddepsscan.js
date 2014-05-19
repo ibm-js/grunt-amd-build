@@ -7,6 +7,7 @@ module.exports = function (grunt) {
 	var getUtils = require(libDir + "utils");
 	var getStack = require(libDir + "modulesStack");
 	var getParseExclude = require(libDir + "parseExclude");
+	var parseLayer = require(libDir + "parseLayer");
 	var modulesLib = require(libDir + "modules");
 	var requirejs = require("requirejs");
 
@@ -44,7 +45,7 @@ module.exports = function (grunt) {
 		var plugins = layerConfig.plugins;
 
 		function initExclude(exclude, excludeShallow, getDeps, getModuleFromMid) {
-			exclude = pE.excludeLayerDeps(exclude, layersMap);
+			exclude = pE.excludeLayerDeps(exclude, layersMap, getModuleFromMid);
 
 			// Exclude specified modules
 			pE.excludeArray(exclude.concat(excludeShallow));
@@ -67,9 +68,9 @@ module.exports = function (grunt) {
 				return exclude.indexOf(module.mid) < 0 && excludeShallow.indexOf(module.mid) < 0;
 			}
 
-			// Check if the layer name is a module name and, if true include it.
+			// if the layer name is a module name, include it.
 			var layerMid = utils.normalize(layerName, null, true);
-			if (isNotExcluded(layerMid) && grunt.file.exists(layerMid + ".js")) {
+			if (isNotExcluded(layerMid) && grunt.file.exists(utils.nameToFilepath(layerMid))) {
 				stack.push(lib.getModuleFromMid(layerMid));
 			}
 
@@ -129,6 +130,7 @@ module.exports = function (grunt) {
 				// Process included layers
 				var layerDeps = [];
 				include = include.filter(function (mid) {
+					// Process currently building layers.
 					var layerData = layersMap[mid];
 					if (layerData) {
 						eachProp(layerData.modules, function (prop, module) {
@@ -142,6 +144,16 @@ module.exports = function (grunt) {
 						// return false to remove the layer mid from the exclude list.
 						return false;
 					}
+					// Process already built layers.
+					var layerContent = parseLayer(lib.getModuleFromMid(mid).content);
+					if (layerContent) {
+						layerContent.forEach(function (mid) {
+							layerDeps.push(mid);
+						});
+						// return false to remove the layer mid from the exclude list.
+						return false;
+					}
+
 					return true;
 				});
 				include = include.concat(layerDeps);

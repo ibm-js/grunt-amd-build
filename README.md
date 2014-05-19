@@ -97,7 +97,7 @@ amdbuild: {
 
 * `amdbuild.layers[x].name` _(String)_: Module ID of the layer. If the layer module ID is already pointing to a module, that module will be included even if it is not explicitly listed in the `amdbuild.layers[x].include` property. This can be avoided by adding that module ID to the `amdbuild.layers[x].excludeShallow` property.
 
-* `amdbuild.layers[x].include`,  `amdbuild.layers[x].exclude` _(Array)_: List of module IDs to include/exclude in/from the layer. If a module ID represents an actual module, this module and its dependencies will be included/excluded in/from the layer. If a module ID is a layer module ID __previously defined in the `layers` array__, all the modules in that layer will be included/excluded in/from the layer. 
+* `amdbuild.layers[x].include`,  `amdbuild.layers[x].exclude` _(Array)_: List of module IDs to include/exclude in/from the layer. If a module ID represents an actual module, this module and its dependencies will be included/excluded in/from the layer. If a module ID is a layer module ID __previously defined in the `layers` array or already built by a previous run__, all the modules in that layer will be included/excluded in/from the layer. 
 
     __Note:__ If a module is a dependency of a included module and of an excluded module, it will be excluded. 
 

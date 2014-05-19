@@ -6,7 +6,8 @@ module.exports = function (grunt) {
 		"*.json",
 		"tasks/**/*.js",
 		"sample/*.js",
-		"tests/**/*.js"
+		"tests/**/*.js",
+		"!**/*_min.js"
 	];
 
 	// Project configuration.
