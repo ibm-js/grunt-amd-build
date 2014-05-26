@@ -1,4 +1,4 @@
-# grunt-amd-build
+# grunt-amd-build [![Build Status](https://travis-ci.org/ibm-js/grunt-amd-build.svg?branch=master)](https://travis-ci.org/ibm-js/grunt-amd-build)
 
 > Grunt plugin to build [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) applications.
 
