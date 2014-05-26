@@ -40,6 +40,15 @@ module.exports = function (grunt) {
 					indentWithTabs: true
 				}
 			}
+		},
+
+		intern: {
+			local: {
+				options: {
+					runType: "client",
+					config: "tests/local"
+				}
+			}
 		}
 	});
 
@@ -47,8 +56,9 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.loadNpmTasks("grunt-jsbeautifier");
 	grunt.loadNpmTasks("grunt-lineending");
+	grunt.loadNpmTasks("intern");
 
 	// By default, beautify and lint.
-	grunt.registerTask("default", ["jsbeautifier", "lineending", "jshint"]);
+	grunt.registerTask("default", ["jsbeautifier", "lineending", "jshint", "intern"]);
 
 };

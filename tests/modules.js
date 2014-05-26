@@ -11,17 +11,17 @@ define([
 		baseUrl: "./",
 		packages: [{
 			name: "modules",
-			location: "tests/units/modules"
+			location: "tests/modules"
 		}]
 	});
 	requirejs.config({
 		baseUrl: "./",
 		packages: [{
 			name: "modules",
-			location: "tests/units/modules"
+			location: "tests/modules"
 		}]
 	});
-	var contentCustNorm = fs.readFileSync("tests/units/modules/custNorm.js").toString();
+	var contentCustNorm = fs.readFileSync("tests/modules/custNorm.js").toString();
 
 
 	registerSuite({
@@ -130,7 +130,7 @@ define([
 				"modules/custNorm",
 				"Just the mid");
 			assert.strictEqual(mod1.filepath,
-				"./tests/units/modules/custNorm.js",
+				"./tests/modules/custNorm.js",
 				"Packages should be applied");
 			assert.strictEqual(mod1.content,
 				contentCustNorm,
@@ -153,10 +153,10 @@ define([
 
 		'getModuleFromPath': function () {
 			var lib = getModules(null, null, null, function () {});
-			var path = "tests/units/modules/custNorm.js";
+			var path = "tests/modules/custNorm.js";
 			var mod1 = lib.getModuleFromPath(path);
 			assert.strictEqual(mod1.mid,
-				"tests/units/modules/custNorm",
+				"tests/modules/custNorm",
 				"Just the mid, but no reverse path/package should be done");
 			assert.strictEqual(mod1.filepath,
 				path,

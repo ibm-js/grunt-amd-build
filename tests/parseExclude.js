@@ -9,7 +9,7 @@ define([
 	function getLayerContent(mid) {
 		var content = "";
 		try {
-			content = fs.readFileSync("./tests/units/" + mid + ".js").toString();
+			content = fs.readFileSync("./tests/" + mid + ".js").toString();
 		} catch (e) {}
 		return {
 			content: content
