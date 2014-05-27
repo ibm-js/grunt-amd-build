@@ -1,9 +1,10 @@
 define([
 	'intern!object',
-	'intern/chai!assert' 
-	'intern/dojo/node!../tasks/lib/normalizeConfig'
-], function (registerSuite, assert, normalizeConfig) {
+	'intern/chai!assert'/*,
+	'intern/dojo/node!../../../tasks/lib/normalizeConfig'*/
+], function (registerSuite, assert/*, normalizeConfig*/) {
 	var config;
+	var normalizeConfig = require.nodeRequire("../../../tasks/lib/normalizeConfig");
 	registerSuite({
 		name: 'Loader config normalization',
 
