@@ -3,5 +3,5 @@ node_js: '0.10'
 before_script:
   - npm install -g grunt-cli
 script: 
-  - grunt jshint
-  - node node_modules/intern/bin/intern-client.js config=tests/local
+  - grunt jshint:all
+  - grunt intern:local

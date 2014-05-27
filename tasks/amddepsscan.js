@@ -68,7 +68,7 @@ module.exports = function (grunt) {
 				return exclude.indexOf(module.mid) < 0 && excludeShallow.indexOf(module.mid) < 0;
 			}
 
-			// if the layer name is a module name, include it.
+			// If the layer name is a module name, include it.
 			var layerMid = utils.normalize(layerName, null, true);
 			if (isNotExcluded(layerMid) && grunt.file.exists(utils.nameToFilepath(layerMid))) {
 				stack.push(lib.getModuleFromMid(layerMid));
