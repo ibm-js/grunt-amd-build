@@ -1,10 +1,6 @@
 define({
 	loader: {
-		baseUrl: "../",
-		packages: [{
-			name: "tests",
-			location: "grunt-amd-build/tests/"
-		}]
+		baseUrl: "./",
 	},
 
 	useLoader: {

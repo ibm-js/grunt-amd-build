@@ -1,6 +1,6 @@
 define([
 	'intern!object',
-	'intern/chai!assert',
+	'intern/chai!assert' 
 	'intern/dojo/node!../tasks/lib/normalizeConfig'
 ], function (registerSuite, assert, normalizeConfig) {
 	var config;
