@@ -1,9 +1,11 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern/dojo/node!../../tasks/lib/parseExclude',
 	'intern/dojo/node!fs'
-], function (registerSuite, assert, getParseExclude, fs) {
+], function (registerSuite, assert, fs) {
+	// Workaround problem with relative paths and dojo/node
+	var getParseExclude = require.nodeRequire("../../../tasks/lib/parseExclude");
+	
 	var parseExclude;
 
 	function getLayerContent(mid) {

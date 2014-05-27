@@ -1,10 +1,11 @@
 define([
 	'intern!object',
-	'intern/chai!assert'/*,
-	'intern/dojo/node!../../../tasks/lib/normalizeConfig'*/
-], function (registerSuite, assert/*, normalizeConfig*/) {
-	var config;
+	'intern/chai!assert'
+], function (registerSuite, assert) {
+	// Workaround problem with relative paths and dojo/node
 	var normalizeConfig = require.nodeRequire("../../../tasks/lib/normalizeConfig");
+	
+	var config;
 	registerSuite({
 		name: 'Loader config normalization',
 

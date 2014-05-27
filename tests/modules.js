@@ -1,12 +1,13 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern/dojo/node!../../tasks/lib/utils',
-	'intern/dojo/node!../../tasks/lib/modules',
 	'intern/dojo/node!requirejs',
 	'intern/dojo/node!fs'
-], function (registerSuite, assert, getUtils, getModules, requirejs, fs) {
-
+], function (registerSuite, assert, requirejs, fs) {
+	// Workaround problem with relative paths and dojo/node
+	var getUtils = require.nodeRequire("../../../tasks/lib/utils");
+	var getModules = require.nodeRequire("../../../tasks/lib/modules");
+	
 	var utils = getUtils({
 		baseUrl: "./",
 		packages: [{

@@ -97,6 +97,13 @@ module.exports = function (grunt) {
 		});
 
 		requirejs.tools.useLib(task);
+		/*requirejs.tools.useLib(function () {});
+		console.log("After");
+		var req = requirejs({
+			context: "uselib"
+		});
+		console.log(req("parse"));
+		done(true)*/
 	});
 
 };
