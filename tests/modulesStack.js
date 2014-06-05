@@ -4,7 +4,7 @@ define([
 ], function (registerSuite, assert) {
 	// Workaround problem with relative paths and dojo/node
 	var getModulesStack = require.nodeRequire("../../../tasks/lib/modulesStack");
-	
+
 	var modulesStack;
 	registerSuite({
 		name: 'ModulesStack',

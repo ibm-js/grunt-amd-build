@@ -4,7 +4,7 @@ define([
 ], function (registerSuite, assert) {
 	// Workaround problem with relative paths and dojo/node
 	var normalizeConfig = require.nodeRequire("../../../tasks/lib/normalizeConfig");
-	
+
 	var config;
 	registerSuite({
 		name: 'Loader config normalization',

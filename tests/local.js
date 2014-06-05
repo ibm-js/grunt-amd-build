@@ -11,6 +11,7 @@ define({
 	suites: [
 		"tests/config",
 		"tests/modulesStack",
+		"tests/resourcesSet",
 		"tests/modules",
 		"tests/parseExclude"
 	],

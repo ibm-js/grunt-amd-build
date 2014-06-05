@@ -56,21 +56,6 @@ module.exports = function (requirejs, utils, buildConfig, warn) {
 		};
 	}
 
-	// Add the resource to the plugins hashmap if needed.
-	function addPluginResources(module, plugins) {
-		if (isBuildtimePlugin(module)) {
-			if (!plugins[module.mid]) {
-				plugins[module.mid] = [];
-			}
-			module.resources.forEach(function (resource) {
-
-				if (plugins[module.mid].indexOf(resource) < 0) {
-					plugins[module.mid].push(resource);
-				}
-			});
-		}
-	}
-
 	// Take a normalized module id and return a module object containing
 	// the module id and the filepath of the module.
 	function getModuleFromMid(mid) {
@@ -86,7 +71,7 @@ module.exports = function (requirejs, utils, buildConfig, warn) {
 			};
 		}
 
-		if (name.resource) {
+		if (isBuildtimePlugin(name)) {
 			cache[name.mid].resources.push(name.resource);
 		}
 		return cache[name.mid];
@@ -135,7 +120,6 @@ module.exports = function (requirejs, utils, buildConfig, warn) {
 
 	return {
 		getNormalize: getNormalize,
-		addPluginResources: addPluginResources,
 		getModuleFromMid: getModuleFromMid,
 		getModuleFromPath: getModuleFromPath,
 		warnConflictLayerName: warnConflictLayerName

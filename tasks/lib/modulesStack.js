@@ -17,6 +17,13 @@ module.exports = function () {
 		},
 		pop: function () {
 			return stack.pop();
+		},
+		process: function (cb) {
+			var current;
+			while (!this.isEmpty()) {
+				current = this.pop();
+				cb(current);
+			}
 		}
 	};
 };

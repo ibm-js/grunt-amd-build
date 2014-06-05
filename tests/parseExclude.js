@@ -5,7 +5,7 @@ define([
 ], function (registerSuite, assert, fs) {
 	// Workaround problem with relative paths and dojo/node
 	var getParseExclude = require.nodeRequire("../../../tasks/lib/parseExclude");
-	
+
 	var parseExclude;
 
 	function getLayerContent(mid) {

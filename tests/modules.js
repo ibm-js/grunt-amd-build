@@ -7,7 +7,7 @@ define([
 	// Workaround problem with relative paths and dojo/node
 	var getUtils = require.nodeRequire("../../../tasks/lib/utils");
 	var getModules = require.nodeRequire("../../../tasks/lib/modules");
-	
+
 	var utils = getUtils({
 		baseUrl: "./",
 		packages: [{
@@ -81,48 +81,6 @@ define([
 
 	registerSuite({
 		name: 'others',
-
-		'addPluginResources': function () {
-			var plugins = {};
-			var lib = getModules(requirejs, utils, {
-				runtimePlugins: ["notRT"]
-			});
-			lib.addPluginResources({
-				mid: "plugA",
-				resources: ["toto", "toto", "titi"]
-			}, plugins);
-			lib.addPluginResources({
-				mid: "plugB",
-				resources: ["titi"]
-			}, plugins);
-			lib.addPluginResources({
-				mid: "notRT",
-				resources: ["tata"]
-			}, plugins);
-
-			assert.strictEqual(plugins.notRT,
-				undefined,
-				"notRT should not be process");
-			assert.isArray(plugins.plugA,
-				"Plugin plug A should have an array of resource");
-			assert.isArray(plugins.plugB,
-				"Plugin plug B should have an array of resource");
-			assert.strictEqual(plugins.plugA.length,
-				2,
-				"2 elts toto and titi");
-			assert.strictEqual(plugins.plugB.length,
-				1,
-				"1 elts titi");
-			assert.strictEqual(plugins.plugA[0],
-				"toto",
-				"first resource is toto");
-			assert.strictEqual(plugins.plugA[1],
-				"titi",
-				"2nd resource is titi");
-			assert.strictEqual(plugins.plugB[0],
-				"titi",
-				"first resource is titi");
-		},
 
 		'getModuleFromMid': function () {
 			var lib = getModules(requirejs, utils, null, function () {});
