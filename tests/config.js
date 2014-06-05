@@ -210,6 +210,15 @@ define([
 				runtimePlugins: ["testru"]
 			});
 			assert.strictEqual(config.runtimePlugins[0], "testru", "runtimePlugins should not be overwritten");
+		},
+		'buildPlugins': function () {
+			config = normalizeConfig.build({});
+			assert.isTrue(config.buildPlugins, "buildPlugins should be initialized with true");
+
+			config = normalizeConfig.build({
+				buildPlugins: false
+			});
+			assert.isFalse(config.buildPlugins, "buildPlugins should not be overwritten");
 		}
 	});
 });

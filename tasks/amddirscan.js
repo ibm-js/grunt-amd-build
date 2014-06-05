@@ -76,9 +76,11 @@ module.exports = function (grunt) {
 					}
 				});
 
-				resourcesSet.process(function (current) {
-					processResources(current.mid, current.resources);
-				});
+				if (buildConfig.buildPlugins) {
+					resourcesSet.process(function (current) {
+						processResources(current.mid, current.resources);
+					});
+				}
 
 				grunt.config([buildCfg], buildConfig);
 

@@ -17,7 +17,8 @@ module.exports = (function () {
 				dir: "./tmp/",
 				layers: [],
 				layersByName: {},
-				runtimePlugins: []
+				runtimePlugins: [],
+				buildPlugins: true
 			};
 		},
 		getLayerDefault = function () {
@@ -37,7 +38,7 @@ module.exports = (function () {
 
 		mixin = function (target, source) {
 			eachProp(source, function (prop, value) {
-				if (!target[prop]) {
+				if (target[prop] === undefined) {
 					target[prop] = value;
 				}
 			});

@@ -126,7 +126,9 @@ module.exports = function (grunt) {
 
 					while (!modulesStack.isEmpty()) {
 						modulesStack.process(processModule);
-						resourcesSet.process(processResource);
+						if (buildConfig.buildPlugins) {
+							resourcesSet.process(processResource);
+						}
 					}
 				}
 
