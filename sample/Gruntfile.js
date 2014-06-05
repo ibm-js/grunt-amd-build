@@ -15,7 +15,19 @@ module.exports = function (grunt) {
 
 	grunt.initConfig({
 		// The loader config should go here.
-		amdloader: {},
+		amdloader: {
+			// Here goes the config for the amd plugins build process.
+			config: {
+				// text should be replace by the module id of text plugin
+				text: {
+					inlineText: true
+				},
+				// i18n should be replace by the module id of i18n plugin
+				i18n: {
+					localesList: ["fr"]
+				}
+			}
+		},
 
 		// The common build config
 		amdbuild: {
@@ -41,16 +53,6 @@ module.exports = function (grunt) {
 					// Only the modules listed here (ie. NOT their dependencies)  will NOT be in the layer.
 				]
 			}]
-		},
-
-		// Here goes the config for the amd plugins build process.
-		amdplugins: {
-			text: {
-				inlineText: true
-			},
-			i18n: {
-				localesList: ["fr"]
-			}
 		},
 
 		// Config to allow concat to generate the layer.

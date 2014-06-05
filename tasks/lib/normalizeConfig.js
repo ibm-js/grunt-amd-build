@@ -67,7 +67,7 @@ module.exports = (function () {
 			// Make sure the baseUrl ends in a slash.
 			config.baseUrl = normalizeUrl(config.baseUrl);
 
-			// Adjust packages`
+			// Adjust packages
 			config.pkgs = {};
 
 			config.packages.forEach(function (pkgObj) {
