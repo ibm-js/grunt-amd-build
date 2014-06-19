@@ -204,12 +204,14 @@ define([
 		},
 		'runtimePlugins': function () {
 			config = normalizeConfig.build({});
-			assert.isArray(config.runtimePlugins, "runtimePlugins should be initialized like []");
+			assert.isArray(config.runtimePlugins, "runtimePlugins should be initialized with dojo plugins");
 
 			config = normalizeConfig.build({
 				runtimePlugins: ["testru"]
 			});
 			assert.strictEqual(config.runtimePlugins[0], "testru", "runtimePlugins should not be overwritten");
+			assert.isTrue(config.runtimePlugins.indexOf("dojo/has") > 0,
+				"default runtimePlugins should be merge with user provided ones.");
 		},
 		'buildPlugins': function () {
 			config = normalizeConfig.build({});

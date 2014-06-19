@@ -95,9 +95,9 @@ amdbuild: {
 	}]
 }
 ```
-* `amdbuild.buildPlugins` _(Boolean)_: If true, the task will try to build plugins.
+* `amdbuild.buildPlugins` _(Boolean)_: If true, the task will try to build plugins. Default to `true`.
 
-* `amdbuild.runtimePlugins` _(Array)_: List of plugin module IDs that can only be resolved at run time. Hence the resources will be ignored, but the plugin itself will be included in the layer.
+* `amdbuild.runtimePlugins` _(Array)_: List of plugin module IDs that can only be resolved at run time. Hence the resources will be ignored, but the plugin itself will be included in the layer. Default to `["dojo/has", "dojo/i18n", "dojo/query", "dojo/domReady", "dojo/text", "dojo/selector/_loader", "dojo/request/registry", "dojo/request/default"]`
 
 * `amdbuild.layers[x].name` _(String)_: Module ID of the layer. If the layer module ID is already pointing to a module, that module will be included even if it is not explicitly listed in the `amdbuild.layers[x].include` property. This can be avoided by adding that module ID to the `amdbuild.layers[x].excludeShallow` property.
 

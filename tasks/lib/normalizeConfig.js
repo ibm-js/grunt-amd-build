@@ -17,7 +17,16 @@ module.exports = (function () {
 				dir: "./tmp/",
 				layers: [],
 				layersByName: {},
-				runtimePlugins: [],
+				runtimePlugins: [
+					"dojo/has",
+					"dojo/i18n",
+					"dojo/query",
+					"dojo/domReady",
+					"dojo/text",
+					"dojo/selector/_loader",
+					"dojo/request/registry",
+					"dojo/request/default"
+				],
 				buildPlugins: true
 			};
 		},
@@ -40,6 +49,10 @@ module.exports = (function () {
 			eachProp(source, function (prop, value) {
 				if (target[prop] === undefined) {
 					target[prop] = value;
+				} else if (prop === "runtimePlugins") {
+					value.forEach(function (mid) {
+						target[prop].push(mid);
+					});
 				}
 			});
 		},
