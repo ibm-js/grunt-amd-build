@@ -91,7 +91,6 @@ module.exports = function (grunt) {
 
 		layers.forEach(function (layer) {
 			grunt.task.run("amddepsscan:" + layer.name + ":" + name + ":" + amdloader);
-			grunt.task.run("amdplugins:" + layer.name + ":" + name + ":" + amdloader);
 			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + outprop);
 			grunt.task.run("concat");
 			grunt.task.run("copy");
