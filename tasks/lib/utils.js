@@ -6,40 +6,39 @@ module.exports = function (cfg) {
 
 	var config = require("./normalizeConfig").loader(cfg),
 		getOwn = require("./lang").getOwn,
-		jsSuffixRegExp = /\.js$/,
+		jsSuffixRegExp = /\.js$/;
 
-		/**
-		 * Trims the . and .. from an array of path segments.
-		 * It will keep a leading path segment if a .. will become
-		 * the first path segment, to help with module name lookups,
-		 * which act like paths, but can be remapped. But the end result,
-		 * all paths that use this function should look normalized.
-		 * NOTE: this method MODIFIES the input array.
-		 * @param {Array} ary the array of path segments.
-		 */
-		trimDots = function (ary) {
-			var i, part, length = ary.length;
-			for (i = 0; i < length; i++) {
-				part = ary[i];
-				if (part === '.') {
-					ary.splice(i, 1);
-					i -= 1;
-				} else if (part === '..') {
-					if (i === 1 && (ary[2] === '..' || ary[0] === '..')) {
-						//End of the line. Keep at least one non-dot
-						//path segment at the front so it can be mapped
-						//correctly to disk. Otherwise, there is likely
-						//no path mapping for a path starting with '..'.
-						//This can still fail, but catches the most reasonable
-						//uses of ..
-						break;
-					} else if (i > 0) {
-						ary.splice(i - 1, 2);
-						i -= 2;
-					}
+	/**
+	 * Trims the . and .. from an array of path segments.
+	 * It will keep a leading path segment if a .. will become
+	 * the first path segment, to help with module name lookups,
+	 * which act like paths, but can be remapped. But the end result,
+	 * all paths that use this function should look normalized.
+	 * NOTE: this method MODIFIES the input array.
+	 * @param {Array} ary the array of path segments.
+	 */
+	function trimDots(ary) {
+		var i, part;
+		for (i = 0; i < ary.length; i++) {
+			part = ary[i];
+			if (part === '.') {
+				ary.splice(i, 1);
+				i -= 1;
+			} else if (part === '..') {
+				// If at the start, or previous value is still ..,
+				// keep them so that when converted to a path it may
+				// still work when converted to a path, even though
+				// as an ID it is less than ideal. In larger point
+				// releases, may be better to just kick out an error.
+				if (i === 0 || (i === 1 && ary[2] === '..') || ary[i - 1] === '..') {
+					continue;
+				} else if (i > 0) {
+					ary.splice(i - 1, 2);
+					i -= 2;
 				}
 			}
-		};
+		}
+	}
 
 	return {
 
@@ -53,47 +52,41 @@ module.exports = function (cfg) {
 		 * only be done if this normalization is for a dependency ID.
 		 * @returns {String} normalized name
 		 */
-		/* Remove jshint warning for the bad indentation @l.103 because of the named loop. */
+		/* Remove jshint warning for the bad indentation @l.96 because of the named for-loop. */
 		/* jshint -W015 */
 		normalize: function (name, baseName, applyMap) {
 			var pkgMain, mapValue, nameParts, i, j, nameSegment, lastIndex,
-				foundMap, foundI, foundStarMap, starI,
-				baseParts = baseName && baseName.split('/'),
-				normalizedBaseParts = baseParts,
+				foundMap, foundI, foundStarMap, starI, normalizedBaseParts,
+				baseParts = (baseName && baseName.split('/')),
 				map = config.map,
 				starMap = map && map['*'];
 
 			//Adjust any relative paths.
-			if (name && name.charAt(0) === '.') {
-				//If have a base name, try to normalize against it,
-				//otherwise, assume it is a top-level require that will
-				//be relative to baseUrl in the end.
-				if (baseName) {
+			if (name) {
+				name = name.split('/');
+				lastIndex = name.length - 1;
+
+				// If wanting node ID compatibility, strip .js from end
+				// of IDs. Have to do this here, and not in nameToUrl
+				// because node allows either .js or non .js to map
+				// to same file.
+				if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
+					name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
+				}
+
+				// Starts with a '.' so need the baseName
+				if (name[0].charAt(0) === '.' && baseParts) {
 					//Convert baseName to array, and lop off the last part,
 					//so that . matches that 'directory' and not name of the baseName's
 					//module. For instance, baseName of 'one/two/three', maps to
 					//'one/two/three.js', but we want the directory, 'one/two' for
 					//this normalization.
 					normalizedBaseParts = baseParts.slice(0, baseParts.length - 1);
-					name = name.split('/');
-					lastIndex = name.length - 1;
-
-					// If wanting node ID compatibility, strip .js from end
-					// of IDs. Have to do this here, and not in nameToUrl
-					// because node allows either .js or non .js to map
-					// to same file.
-					if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
-						name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
-					}
-
 					name = normalizedBaseParts.concat(name);
-					trimDots(name);
-					name = name.join('/');
-				} else if (name.indexOf('./') === 0) {
-					// No baseName, so this is ID is resolved relative
-					// to baseUrl, pull off the leading dot.
-					name = name.substring(2);
 				}
+
+				trimDots(name);
+				name = name.join('/');
 			}
 
 			//Apply map config if available.
