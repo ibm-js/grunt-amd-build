@@ -108,6 +108,11 @@ module.exports = (function () {
 						.replace(jsSuffixRegExp, '');
 
 				}
+
+				// Trim useless starting "./"
+				eachProp(config.paths, function (path, location) {
+					config.paths[path] = location.length > 2 ? location.replace(/^\.\//, "") : location;
+				});
 			});
 
 			config._normalized = true;

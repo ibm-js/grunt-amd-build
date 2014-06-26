@@ -1,4 +1,4 @@
-module.exports = function (requirejs, layer, buildConfig, utils, toTransport) {
+module.exports = function (requirejs, layer, utils, toTransport) {
 
 	// Add processed resources to the layer data for logging 
 	// and to avoid multiple processing of the same resource.
@@ -26,7 +26,6 @@ module.exports = function (requirejs, layer, buildConfig, utils, toTransport) {
 
 	function writeFile(filepath, content) {
 		var pluginsFiles = layer.pluginsFiles;
-		filepath = buildConfig.dir + filepath;
 		pluginsFiles[filepath] = (pluginsFiles[filepath] || "") + content;
 	}
 	writeFile.asModule = function (moduleName, filepath, content) {

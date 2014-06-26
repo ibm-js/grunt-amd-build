@@ -151,7 +151,7 @@ module.exports = function (cfg) {
 		 * it is assumed to have already been normalized. This is an
 		 * internal API, not a public one. Use toUrl for the public API.
 		 */
-		nameToFilepath: function (moduleName) {
+		nameToFilepath: function (moduleName, noExt) {
 			var paths, syms, i, parentModule, url,
 				parentPath,
 				pkgMain = getOwn(config.pkgs, moduleName);
@@ -182,7 +182,7 @@ module.exports = function (cfg) {
 			}
 
 			//Join the path parts together, then figure out if baseUrl is needed.
-			url = syms.join('/') + '.js';
+			url = syms.join('/') + (noExt ? '' : '.js');
 			url = (url.charAt(0) === '/' || url.match(/^[\w\+\.\-]+:/) ? '' : config.baseUrl) + url;
 
 			return url;

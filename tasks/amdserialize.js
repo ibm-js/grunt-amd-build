@@ -5,8 +5,11 @@ module.exports = function (grunt) {
 	var libDir = "./lib/",
 		lang = require(libDir + "lang"),
 		normalizeCfg = require(libDir + "normalizeConfig");
+	var getUtils = require(libDir + "utils");
 
-	grunt.registerTask("amdserialize", function (layerName, buildCfg, outputProp) {
+	grunt.registerTask("amdserialize", function (layerName, buildCfg, loaderCfg, outputProp) {
+		var loaderConfig = grunt.config(loaderCfg);
+		var utils = getUtils(loaderConfig);
 		var buildConfig = normalizeCfg.build(grunt.config(buildCfg));
 		var layerConfig = buildConfig.layersByName[layerName];
 		var dir = buildConfig.dir;
@@ -27,13 +30,16 @@ module.exports = function (grunt) {
 			var path = dir + module.filepath;
 			grunt.file.write(path, module.content);
 			modulesFiles.abs.push(path);
-			modulesFiles.rel.push(module.mid + ".js");
+			modulesFiles.rel.push(module.filepath);
 		});
 
 		lang.eachProp(layerConfig.pluginsFiles, function (filepath, content) {
-			grunt.file.write(filepath, content);
-			pluginsFiles.abs.push(filepath);
-			pluginsFiles.rel.push(filepath.replace(new RegExp("^(?:.\/)?" + dir), ""));
+			filepath = utils.nameToFilepath(filepath, true);
+			var absPath = dir + filepath;
+
+			grunt.file.write(absPath, content);
+			pluginsFiles.abs.push(absPath);
+			pluginsFiles.rel.push(filepath);
 		});
 
 		outputProp = outputProp || "amdoutput";

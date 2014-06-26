@@ -58,7 +58,7 @@ module.exports = function (grunt) {
 				}
 
 				// Create the processResources function as everything needed is now here.
-				var processResources = getProcessResources(requirejs, layer, buildConfig, utils, toTransport);
+				var processResources = getProcessResources(requirejs, layer, utils, toTransport);
 
 				var resourcesSet = getResourcesSet();
 
