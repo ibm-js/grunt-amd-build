@@ -37,6 +37,23 @@ module.exports = function (grunt) {
 			filepath = utils.nameToFilepath(filepath, true);
 			var absPath = dir + filepath;
 
+			// Process images included in css with url() param.
+			if (/.css$/.test(filepath)) {
+				var fileDir = filepath.replace(/[^\/]*$/, "");
+				var urlRE = /url\(['"]?([^\)'"]*)/g;
+				var match = null;
+				// Extra parenthesis in the while condition to silence jshint.
+				// The assignment is required here to access the matched group of a global regexp.
+				while ((match = urlRE.exec(content))) {
+					var src = fileDir + match[1];
+					grunt.file.copy(src, dir + src, {
+						encoding: null
+					});
+					pluginsFiles.abs.push(dir + src);
+					pluginsFiles.rel.push(src);
+				}
+			}
+
 			grunt.file.write(absPath, content);
 			pluginsFiles.abs.push(absPath);
 			pluginsFiles.rel.push(filepath);
