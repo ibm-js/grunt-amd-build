@@ -30,6 +30,13 @@ module.exports = function (grunt) {
 		return grunt.file.expand(options, patterns.concat(excludePatterns));
 	}
 
+	function isRealModule(dep) {
+		if (dep === "exports" || dep === "module" || dep === "require") {
+			return false;
+		}
+		return true;
+	}
+
 
 	grunt.registerTask("amddirscan", function (layerName, buildCfg, loaderCfg) {
 		var done = this.async();
@@ -69,6 +76,7 @@ module.exports = function (grunt) {
 
 						parse.findDependencies(module.mid, module.content)
 							.map(lib.getNormalize(module.mid))
+							.filter(isRealModule)
 							.map(lib.getModuleFromMid)
 							.forEach(function (module) {
 								resourcesSet.push(module);

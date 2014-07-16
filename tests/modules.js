@@ -34,7 +34,7 @@ define([
 				"toto",
 				"./ is top level");
 			assert.strictEqual(lib.getNormalize()("toto!"),
-				"toto",
+				"toto!",
 				"empty resource so nothing to normalize.");
 			// No plugin normalize
 			assert.strictEqual(lib.getNormalize()("modules/noNorm!./test"),

@@ -15,19 +15,23 @@ module.exports = function (requirejs, utils, buildConfig, warn) {
 	// the module name in mid and resource is an empty string.
 	function splitPluginMid(mid) {
 		var index = mid.indexOf('!');
-		index = index === -1 ? mid.length : index;
-		return {
-			mid: mid.substring(0, index),
-			resource: mid.substring(index + 1, mid.length)
-		};
+		if (index === -1) {
+			return {
+				mid: mid
+			};
+		} else {
+			return {
+				mid: mid.substring(0, index),
+				resource: mid.substring(index + 1, mid.length)
+			};
+		}
 	}
 
 	// This method is private.
 	//
 	// Take a name as returned by splitPluginMid and returns a boolean.
 	function isBuildtimePlugin(name) {
-		var resources = name.resource || (name.resources && name.resources.length !== 0);
-		return resources && runtimePlugins.indexOf(name.mid) < 0;
+		return typeof name.resource === "string" && runtimePlugins.indexOf(name.mid) < 0;
 	}
 
 	// current is a mid.
@@ -39,15 +43,17 @@ module.exports = function (requirejs, utils, buildConfig, warn) {
 			name.mid = utils.normalize(name.mid, current, true);
 
 			if (isBuildtimePlugin(name)) {
-				// This module is a plugin and should be optimized at buildtime
-				// so the resource is normalized to ease things up later
-				var plugin = requirejs(name.mid);
-				if (plugin.normalize) {
-					name.resource = plugin.normalize(name.resource, function (mid) {
-						return utils.normalize(mid, current, true);
-					});
-				} else {
-					name.resource = utils.normalize(name.resource, current, true);
+				if (name.resource.length) {
+					// This module is a plugin and should be optimized at buildtime
+					// so the resource is normalized to ease things up later
+					var plugin = requirejs(name.mid);
+					if (plugin.normalize) {
+						name.resource = plugin.normalize(name.resource, function (mid) {
+							return utils.normalize(mid, current, true);
+						});
+					} else {
+						name.resource = utils.normalize(name.resource, current, true);
+					}
 				}
 				return name.mid + "!" + name.resource;
 			} else {
