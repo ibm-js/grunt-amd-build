@@ -7,15 +7,7 @@ module.exports = function (grunt) {
 	var getResourcesSet = require(libDir + "resourcesSet");
 	var getProcessResources = require(libDir + "plugins");
 	var getUtils = require(libDir + "utils");
-	var requirejs = require("requirejs");
-
-	requirejs.config({
-		//Pass the top-level main.js/index.js require
-		//function to requirejs so that node modules
-		//are loaded relative to the top-level JS file.
-		nodeRequire: require
-	});
-
+	var requirejs = require(libDir + "requirejs");
 
 	function getJsModules(layer) {
 		function negate(pattern) {

@@ -11,15 +11,7 @@ module.exports = function (grunt) {
 	var getProcessResources = require(libDir + "plugins");
 	var parseLayer = require(libDir + "parseLayer");
 	var modulesLib = require(libDir + "modules");
-	var requirejs = require("requirejs");
-
-	requirejs.config({
-		//Pass the top-level main.js/index.js require
-		//function to requirejs so that node modules
-		//are loaded relative to the top-level JS file.
-		nodeRequire: require,
-		isBuild: true
-	});
+	var requirejs = require(libDir + "requirejs");
 
 	grunt.registerTask("amddepsscan", function (layerName, buildCfg, loaderCfg) {
 		var done = this.async();
@@ -116,7 +108,7 @@ module.exports = function (grunt) {
 						}
 					}
 
-					function processResource(current) {
+					function processPlugin(current) {
 						// Process the resources and store modules required by plugins.
 						var mids = processResources(current.mid, current.resources);
 						mids.forEach(function (mid) {
@@ -127,7 +119,7 @@ module.exports = function (grunt) {
 					while (!modulesStack.isEmpty()) {
 						modulesStack.process(processModule);
 						if (buildConfig.buildPlugins) {
-							resourcesSet.process(processResource);
+							resourcesSet.process(processPlugin);
 						}
 					}
 				}

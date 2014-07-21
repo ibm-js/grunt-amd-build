@@ -1,6 +1,6 @@
 module.exports = function (requirejs, layer, utils, toTransport) {
 
-	// Add processed resources to the layer data for logging 
+	// Add processed resources to the layer data for logging
 	// and to avoid multiple processing of the same resource.
 	function addPluginResource(pluginName, resource) {
 		var plugins = layer.plugins;
@@ -37,6 +37,9 @@ module.exports = function (requirejs, layer, utils, toTransport) {
 		var pluginModules = [];
 
 		function addModules(modules) {
+			modules = modules.map(function (mid) {
+				return utils.normalize(mid, pluginName, true);
+			});
 			pluginModules = pluginModules.concat(modules);
 		}
 
