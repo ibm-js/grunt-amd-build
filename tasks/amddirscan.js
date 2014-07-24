@@ -4,8 +4,7 @@ module.exports = function (grunt) {
 	var libDir = "./lib/";
 	var normalizeCfg = require(libDir + "normalizeConfig");
 	var modulesLib = require(libDir + "modules");
-	var getResourcesSet = require(libDir + "resourcesSet");
-	var getProcessResources = require(libDir + "plugins");
+	var pluginsLib = require(libDir + "plugins");
 	var getUtils = require(libDir + "utils");
 	var requirejs = require(libDir + "requirejs");
 
@@ -22,14 +21,6 @@ module.exports = function (grunt) {
 		return grunt.file.expand(options, patterns.concat(excludePatterns));
 	}
 
-	function isRealModule(dep) {
-		if (dep === "exports" || dep === "module" || dep === "require") {
-			return false;
-		}
-		return true;
-	}
-
-
 	grunt.registerTask("amddirscan", function (layerName, buildCfg, loaderCfg) {
 		var done = this.async();
 		var buildConfig = normalizeCfg.build(grunt.config(buildCfg));
@@ -44,7 +35,7 @@ module.exports = function (grunt) {
 
 		var utils = getUtils(loaderConfig);
 
-		var lib = modulesLib(requirejs, utils, buildConfig, grunt.fail.warn);
+		var lib = modulesLib(requirejs, utils, grunt.fail.warn);
 
 		var modulesList = getJsModules(layer)
 			.map(lib.getModuleFromPath);
@@ -57,30 +48,22 @@ module.exports = function (grunt) {
 				}
 
 				// Create the processResources function as everything needed is now here.
-				var processResources = getProcessResources(requirejs, layer, utils, toTransport);
+				var plugins = pluginsLib(requirejs, layer, utils, toTransport, buildConfig);
 
-				var resourcesSet = getResourcesSet();
+				modulesList.forEach(function (current) {
+					if (current.content) {
+						current.content = toTransport(current.mid, current.filepath, current.content);
+						modules[current.mid] = current;
 
-				modulesList.forEach(function (module) {
-					if (module.content) {
-						module.content = toTransport(module.mid, module.filepath, module.content);
-						modules[module.mid] = module;
-
-						parse.findDependencies(module.mid, module.content)
-							.map(lib.getNormalize(module.mid))
-							.filter(isRealModule)
-							.map(lib.getModuleFromMid)
-							.forEach(function (module) {
-								resourcesSet.push(module);
+						parse.findDependencies(current.mid, current.content)
+							.map(lib.getNormalize(current.mid))
+							.forEach(function (mid) {
+								plugins.process(mid, lib.getNormalize(current.mid));
 							});
 					}
 				});
 
-				if (buildConfig.buildPlugins) {
-					resourcesSet.process(function (current) {
-						processResources(current.mid, current.resources);
-					});
-				}
+				plugins.onLayerEnd();
 
 				grunt.config([buildCfg], buildConfig);
 

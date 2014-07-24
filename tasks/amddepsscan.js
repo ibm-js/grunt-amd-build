@@ -6,11 +6,10 @@ module.exports = function (grunt) {
 	var normalizeCfg = require(libDir + "normalizeConfig");
 	var getUtils = require(libDir + "utils");
 	var getModulesStack = require(libDir + "modulesStack");
-	var getResourcesSet = require(libDir + "resourcesSet");
 	var getParseExclude = require(libDir + "parseExclude");
-	var getProcessResources = require(libDir + "plugins");
 	var parseLayer = require(libDir + "parseLayer");
 	var modulesLib = require(libDir + "modules");
+	var pluginsLib = require(libDir + "plugins");
 	var requirejs = require(libDir + "requirejs");
 
 	grunt.registerTask("amddepsscan", function (layerName, buildCfg, loaderCfg) {
@@ -32,7 +31,7 @@ module.exports = function (grunt) {
 
 		var utils = getUtils(loaderConfig);
 
-		var lib = modulesLib(requirejs, utils, buildConfig, grunt.fail.warn);
+		var lib = modulesLib(requirejs, utils, grunt.fail.warn);
 		var pE = getParseExclude();
 
 		var layer = layersMap[layerName];
@@ -56,7 +55,7 @@ module.exports = function (grunt) {
 		}
 
 		// Initialize the includeList with the layer name if it's a module name.
-		function initStack(stack, include, exclude, excludeShallow) {
+		function initStack(stack, plugins, include, exclude, excludeShallow) {
 			function isNotExcluded(module) {
 				return exclude.indexOf(module.mid) < 0 && excludeShallow.indexOf(module.mid) < 0;
 			}
@@ -68,7 +67,17 @@ module.exports = function (grunt) {
 			}
 
 			// General init
-			include.map(lib.getModuleFromMid)
+			// Process plugin specified in the include
+			var pluginDeps = [];
+			include = include.map(function (mid) {
+				var modulesToAdd = plugins.process(mid, lib.getNormalize(null));
+				pluginDeps = pluginDeps.concat(modulesToAdd);
+				//return only the module id.
+				return plugins.splitPluginMid(mid).mid;
+			});
+			// Process regular modules.
+			include.concat(pluginDeps)
+				.map(lib.getModuleFromMid)
 				.filter(isNotExcluded)
 				.forEach(function (module) {
 					addToStack(module, stack);
@@ -78,7 +87,7 @@ module.exports = function (grunt) {
 		function task(req) {
 			req(["parse", "transform"], function (parse, transform) {
 				// Create the processResources function as everything needed is now here.
-				var processResources = getProcessResources(requirejs, layer, utils, toTransport);
+				var plugins = pluginsLib(requirejs, layer, utils, toTransport, buildConfig);
 
 				// Simple wrapper to simplify the call of toTransport.
 				function toTransport(moduleName, filepath, content) {
@@ -90,38 +99,37 @@ module.exports = function (grunt) {
 						.map(lib.getNormalize(module.mid));
 				}
 
-				function processStacks(modulesStack, resourcesSet, addDeps) {
-					function processModule(current) {
-						// if content is empty, then something went wrong so skip this module.
-						if (current.content) {
-							grunt.verbose.writeln(current.mid);
-							current.content = toTransport(current.mid, current.filepath, current.content);
-							if (addDeps) {
-								getDeps(current).filter(pE.isMidToInclude)
-									.map(lib.getModuleFromMid)
-									.forEach(function (module) {
-										addToStack(module, modulesStack);
-										resourcesSet.push(module);
-									});
-							}
-							modules[current.mid] = current;
-						}
-					}
+				function getModules(mids) {
+					return mids.filter(pE.isMidToInclude)
+						.map(lib.getModuleFromMid);
+				}
 
-					function processPlugin(current) {
-						// Process the resources and store modules required by plugins.
-						var mids = processResources(current.mid, current.resources);
-						mids.forEach(function (mid) {
-							addToStack(lib.getModuleFromMid(mid), modulesStack);
+				function processStack(modulesStack, addDeps) {
+					while (!modulesStack.isEmpty()) {
+						modulesStack.process(function (current) {
+							// if content is empty, then something went wrong so skip this module.
+							if (current.content) {
+								grunt.verbose.writeln(current.mid);
+								current.content = toTransport(current.mid, current.filepath, current.content);
+								if (addDeps) {
+									var pluginDeps = [];
+									// Process plugins
+									var deps = getDeps(current).map(function (mid) {
+										var modulesToAdd = plugins.process(mid, lib.getNormalize(current.mid));
+										pluginDeps = pluginDeps.concat(modulesToAdd);
+										//return only the module id.
+										return plugins.splitPluginMid(mid).mid;
+									});
+									// Process regular modules.
+									getModules(deps.concat(pluginDeps)).forEach(function (module) {
+										addToStack(module, modulesStack);
+									});
+								}
+								modules[current.mid] = current;
+							}
 						});
 					}
-
-					while (!modulesStack.isEmpty()) {
-						modulesStack.process(processModule);
-						if (buildConfig.buildPlugins) {
-							resourcesSet.process(processPlugin);
-						}
-					}
+					plugins.onLayerEnd();
 				}
 
 
@@ -171,18 +179,17 @@ module.exports = function (grunt) {
 				// Initialize exclude
 				initExclude(exclude, excludeShallow, getDeps, lib.getModuleFromMid);
 
-				// Create stacks to store modules to process.
+				// Create stack to store modules to process.
 				var modulesStack = getModulesStack();
-				var resourcesSet = getResourcesSet();
 
 				// Search dependencies
 				grunt.verbose.writeln("Found dependencies for " + layer.name);
-				initStack(modulesStack, include, exclude, excludeShallow);
-				processStacks(modulesStack, resourcesSet, true);
+				initStack(modulesStack, plugins, include, exclude, excludeShallow);
+				processStack(modulesStack, true);
 
 				//Process includeShallow
-				initStack(modulesStack, includeShallow, exclude, excludeShallow);
-				processStacks(modulesStack, resourcesSet, false);
+				initStack(modulesStack, plugins, includeShallow, exclude, excludeShallow);
+				processStack(modulesStack, false);
 
 				//Logging
 				grunt.log.ok();

@@ -36,18 +36,9 @@ define([
 			assert.strictEqual(lib.getNormalize()("toto!"),
 				"toto!",
 				"empty resource so nothing to normalize.");
-			// No plugin normalize
 			assert.strictEqual(lib.getNormalize()("modules/noNorm!./test"),
-				"modules/noNorm!test",
-				"./ is top level");
-			// Default normalize
-			assert.strictEqual(lib.getNormalize()("modules/defNorm!./test"),
-				"modules/defNorm!test",
-				"./ is top level");
-			// Custom normalize
-			assert.strictEqual(lib.getNormalize()("modules/custNorm!test"),
-				"modules/custNorm!custom/test",
-				"Should use the plugin provided normalize");
+				"modules/noNorm!./test",
+				"Plugin should not be normalized yet.");
 		},
 
 		'with reference': function () {
@@ -58,24 +49,9 @@ define([
 			assert.strictEqual(lib.getNormalize("titi/blabla")("../toto"),
 				"toto",
 				"../ is sibling of titi");
-			// No plugin normalize
 			assert.strictEqual(lib.getNormalize("titi/blabla")("modules/noNorm!./test"),
-				"modules/noNorm!titi/test",
-				"./ is relative to titi");
-			assert.strictEqual(lib.getNormalize("titi/blabla")("modules/noNorm!../test"),
-				"modules/noNorm!test",
-				"../ is sibling of titi");
-			// Default normalize
-			assert.strictEqual(lib.getNormalize("titi/blabla")("modules/defNorm!./test"),
-				"modules/defNorm!titi/test",
-				"./ is relative to titi");
-			assert.strictEqual(lib.getNormalize("titi/blabla")("modules/defNorm!../test"),
-				"modules/defNorm!test",
-				"../ is sibling of titi");
-			// Custom normalize
-			assert.strictEqual(lib.getNormalize("titi/blabla")("modules/custNorm!test"),
-				"modules/custNorm!custom/test",
-				"Should use the plugin provided normalize");
+				"modules/noNorm!./test",
+				"Plugin should not be normalized yet");
 		}
 	});
 
@@ -94,20 +70,11 @@ define([
 			assert.strictEqual(mod1.content,
 				contentCustNorm,
 				"The file should be found");
-			assert.strictEqual(mod1.resources[0],
-				"toto",
-				"There is a toto resource");
 
 			var mod2 = lib.getModuleFromMid("modules/custNorm!titi");
 			assert.strictEqual(mod1,
 				mod2,
 				"Second time, the module should come from cache");
-			assert.strictEqual(mod1.resources[0],
-				"toto",
-				"Resources are additives");
-			assert.strictEqual(mod1.resources[1],
-				"titi",
-				"Resources are additives");
 		},
 
 		'getModuleFromPath': function () {

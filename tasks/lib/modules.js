@@ -1,37 +1,11 @@
-module.exports = function (requirejs, utils, buildConfig, warn) {
+module.exports = function (requirejs, utils, warn) {
 	"use strict";
 	var fs = require('fs');
 
-	var runtimePlugins = buildConfig ? buildConfig.runtimePlugins || [] : [];
-
 	var cache = {};
 
-	// This method is private.
-	//
-	// Take a module id and return an object.
-	// If the module id is a plugin (ie. contains a !) the function returns
-	// the plugin name in mid and the resource in resource.
-	// If the module id is a regular module, the function returns
-	// the module name in mid and resource is an empty string.
-	function splitPluginMid(mid) {
-		var index = mid.indexOf('!');
-		if (index === -1) {
-			return {
-				mid: mid
-			};
-		} else {
-			return {
-				mid: mid.substring(0, index),
-				resource: mid.substring(index + 1, mid.length)
-			};
-		}
-	}
-
-	// This method is private.
-	//
-	// Take a name as returned by splitPluginMid and returns a boolean.
-	function isBuildtimePlugin(name) {
-		return typeof name.resource === "string" && runtimePlugins.indexOf(name.mid) < 0;
+	function stripPlugin(mid) {
+		return mid.split("!")[0];
 	}
 
 	// current is a mid.
@@ -39,48 +13,24 @@ module.exports = function (requirejs, utils, buildConfig, warn) {
 	// to current.
 	function getNormalize(current) {
 		return function normalize(mid) {
-			var name = splitPluginMid(mid);
-			name.mid = utils.normalize(name.mid, current, true);
-
-			if (isBuildtimePlugin(name)) {
-				if (name.resource.length) {
-					// This module is a plugin and should be optimized at buildtime
-					// so the resource is normalized to ease things up later
-					var plugin = requirejs(name.mid);
-					if (plugin.normalize) {
-						name.resource = plugin.normalize(name.resource, function (mid) {
-							return utils.normalize(mid, current, true);
-						});
-					} else {
-						name.resource = utils.normalize(name.resource, current, true);
-					}
-				}
-				return name.mid + "!" + name.resource;
-			} else {
-				return name.mid;
-			}
+			return utils.normalize(mid, current, true);
 		};
 	}
 
 	// Take a normalized module id and return a module object containing
 	// the module id and the filepath of the module.
 	function getModuleFromMid(mid) {
-		var name = splitPluginMid(mid);
+		mid = stripPlugin(mid);
 
-		if (!cache[name.mid]) {
-			var path = utils.nameToFilepath(name.mid);
-			cache[name.mid] = {
-				mid: name.mid,
+		if (!cache[mid]) {
+			var path = utils.nameToFilepath(mid);
+			cache[mid] = {
+				mid: mid,
 				filepath: path,
-				content: readFile(path),
-				resources: []
+				content: readFile(path)
 			};
 		}
-
-		if (isBuildtimePlugin(name)) {
-			cache[name.mid].resources.push(name.resource);
-		}
-		return cache[name.mid];
+		return cache[mid];
 	}
 
 	function getModuleFromPath(path) {
