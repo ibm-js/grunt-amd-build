@@ -20,7 +20,7 @@ module.exports = function (grunt) {
 		var content = "{\n";
 		lang.eachProp(buildConfig.layersByName, function (name, layer) {
 			content += '\t"' + name + '": {\n';
-			lang.eachProp(layer.modules, function (module) {
+			Object.keys(layer.modules).sort().forEach(function (module) {
 				content += '\t\t"' + module + '": true,\n';
 			});
 
