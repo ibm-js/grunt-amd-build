@@ -67,7 +67,7 @@ module.exports = function (requirejs, layer, utils, toTransport, buildConfig) {
 			var name = splitPluginMid(mid);
 			var pluginName = name.mid;
 			var resource = name.resource;
-			if (!resource || !isPluginToProcess(pluginName) || !isResourceToProcess(resource)) {
+			if (resource === undefined || !isPluginToProcess(pluginName) || !isResourceToProcess(resource)) {
 				return [];
 			}
 
@@ -78,7 +78,8 @@ module.exports = function (requirejs, layer, utils, toTransport, buildConfig) {
 			var pluginModules = [pluginName];
 
 			function addModules(modules) {
-				modules.map(function (mid) {
+				modules = modules.map(function (mid) {
+					mid = normalize(mid);
 					var modulesToAdd = pluginLib.process(mid, normalize);
 					pluginModules = pluginModules.concat(modulesToAdd);
 					//return only the module id.
