@@ -1,7 +1,7 @@
 module.exports = function () {
 	"use strict";
 
-	var parseLayer = require("./parseLayer");
+	var parseLayer = require("./excludeLayer");
 	var eachProp = require("./lang").eachProp;
 
 	// Init the exclude map with cjs modules.
@@ -27,7 +27,7 @@ module.exports = function () {
 				return false;
 			}
 			// Process already built layers.
-			var layerContent = parseLayer(getModuleFromMid(mid).content);
+			var layerContent = excludeLayer(getModuleFromMid(mid).content);
 			if (layerContent) {
 				layerContent.forEach(function (mid) {
 					excludeMap[mid] = true;
