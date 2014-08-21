@@ -6,7 +6,7 @@ module.exports = function (grunt) {
 	var tmpdir = "./tmp/";
 
 	// The final output directory.
-	var outdir = "./out/";
+	var outdir = "./build/";
 
 	// The grunt.config property populated by amdserialize, containing the
 	// list of files to include in the layer.
@@ -16,16 +16,13 @@ module.exports = function (grunt) {
 	grunt.initConfig({
 		// The loader config should go here.
 		amdloader: {
-			// Here goes the config for the amd plugins build process.
+			baseUrl: "./",
+
+			// Enable build of requirejs-text/text
+			inlineText: true,
+
+			// Here goes the config for the amd plugins build process (has, i18n, ecma402...).
 			config: {
-				// text should be replace by the module id of text plugin
-				text: {
-					inlineText: true
-				},
-				// i18n should be replace by the module id of i18n plugin
-				i18n: {
-					localesList: ["fr"]
-				}
 			}
 		},
 
@@ -55,10 +52,11 @@ module.exports = function (grunt) {
 			}]
 		},
 
-		// Config to allow concat to generate the layer.
-		concat: {
+		// Config to allow uglify to generate the layer.
+		uglify: {
 			options: {
-				banner: "<%= " + outprop + ".header%>"
+				banner: "<%= " + outprop + ".header%>",
+				sourceMap: true
 			},
 			dist: {
 				src: "<%= " + outprop + ".modules.abs %>",
@@ -68,18 +66,18 @@ module.exports = function (grunt) {
 
 		// Copy the plugin files to the real output directory.
 		copy: {
-			dist: {
+			plugins: {
 				expand: true,
 				cwd: tmpdir,
 				src: "<%= " + outprop + ".plugins.rel %>",
-				dest: outdir
+				dest: outdir,
+				dot: true
 			}
 		},
 
-		// Erase temp directory and previous build
+		// Erase previous build.
 		clean: {
-			erase: [outdir],
-			finish: [tmpdir]
+			erase: [outdir]
 		}
 	});
 
@@ -91,9 +89,9 @@ module.exports = function (grunt) {
 
 		layers.forEach(function (layer) {
 			grunt.task.run("amddepsscan:" + layer.name + ":" + name + ":" + amdloader);
-			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + outprop);
-			grunt.task.run("concat");
-			grunt.task.run("copy");
+			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + amdloader + ":" + outprop);
+			grunt.task.run("uglify");
+			grunt.task.run("copy:plugins");
 		});
 	});
 
@@ -102,10 +100,10 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-amd-build");
 
 	// Load vendor plugins.
-	grunt.loadNpmTasks("grunt-contrib-concat");
+	grunt.loadNpmTasks("grunt-contrib-uglify");
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
 	// Default task.
-	grunt.registerTask("default", ["clean:erase", "amdbuild:amdloader", "clean:finish"]);
+	grunt.registerTask("default", ["clean:erase", "amdbuild:amdloader", "amdreportjson:amdbuild"]);
 };
