@@ -159,7 +159,7 @@ module.exports = function (grunt) {
 								layerDeps.push(prop + "!" + resource);
 							});
 						});
-						// return false to remove the layer mid from the exclude list.
+						// return false to remove the layer mid from the include list.
 						return false;
 					}
 					// Process already built layers.

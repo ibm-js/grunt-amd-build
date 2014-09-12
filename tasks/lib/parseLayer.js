@@ -2,7 +2,7 @@ module.exports = function (content) {
 	var result = [];
 
 	var match = null;
-	var RE = /define\("([^"]*)",/g;
+	var RE = /define\(["']([^"]*)["'],/g;
 	// Extra parenthesis in the while condition to silence jshint.
 	// The assignment is required here to access the matched group of a global regexp.
 	while ((match = RE.exec(content))) {
