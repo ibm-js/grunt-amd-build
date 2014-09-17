@@ -5,11 +5,8 @@ module.exports = function (grunt) {
 	var libDir = "./lib/",
 		lang = require(libDir + "lang"),
 		normalizeCfg = require(libDir + "normalizeConfig");
-	var getUtils = require(libDir + "utils");
 
-	grunt.registerTask("amdserialize", function (layerName, buildCfg, loaderCfg, outputProp) {
-		var loaderConfig = grunt.config(loaderCfg);
-		var utils = getUtils(loaderConfig);
+	grunt.registerTask("amdserialize", function (layerName, buildCfg, outputProp) {
 		var buildConfig = normalizeCfg.build(grunt.config(buildCfg));
 		var layerConfig = buildConfig.layersByName[layerName];
 		var dir = buildConfig.dir;
@@ -34,7 +31,6 @@ module.exports = function (grunt) {
 		});
 
 		lang.eachProp(layerConfig.pluginsFiles, function (filepath, content) {
-			filepath = utils.nameToFilepath(filepath, true);
 			var absPath = dir + filepath;
 
 			// Process images included in css with url() param.
@@ -43,7 +39,7 @@ module.exports = function (grunt) {
 				var urlRE = /url\(['"]?([^\)'"]*)/g;
 				var match = null;
 				// Extra parenthesis in the while condition to silence jshint.
-				// The assignment is required here to access the matched group of a global regexp.
+				// The assignment is required here to access the matched groups of a global regexp.
 				while ((match = urlRE.exec(content))) {
 					var src = fileDir + match[1];
 					grunt.file.copy(src, dir + src, {

@@ -3,20 +3,25 @@
 module.exports = function (grunt) {
 
 	// A temporary directory used by amdserialize to output the processed modules.
-	var tmpdir = "./tmp/";
+	var tmpdir = "tmp/";
 
 	// The final output directory.
-	var outdir = "./build/";
+	var outdir = "build/";
 
 	// The grunt.config property populated by amdserialize, containing the
 	// list of files to include in the layer.
 	var outprop = "amdoutput";
 
+	// The requirejs baseUrl.
+	var baseUrl =  "./";
+
+	// Deployment directory.
+	var deploydir = "deploy/";
 
 	grunt.initConfig({
 		// The loader config should go here.
 		amdloader: {
-			baseUrl: "./",
+			baseUrl: baseUrl,
 
 			// Enable build of requirejs-text/text
 			inlineText: true,
@@ -72,6 +77,13 @@ module.exports = function (grunt) {
 				src: "<%= " + outprop + ".plugins.rel %>",
 				dest: outdir,
 				dot: true
+			},
+			deploy: {
+				expand: true,
+				cwd: outdir + baseUrl,
+				src: "*/*",
+				dest: deploydir,
+				dot: true
 			}
 		},
 
@@ -89,7 +101,7 @@ module.exports = function (grunt) {
 
 		layers.forEach(function (layer) {
 			grunt.task.run("amddepsscan:" + layer.name + ":" + name + ":" + amdloader);
-			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + amdloader + ":" + outprop);
+			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + outprop);
 			grunt.task.run("uglify");
 			grunt.task.run("copy:plugins");
 		});
@@ -105,5 +117,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
 	// Default task.
-	grunt.registerTask("default", ["clean:erase", "amdbuild:amdloader", "amdreportjson:amdbuild"]);
+	grunt.registerTask("build", ["clean:erase", "amdbuild:amdloader", "amdreportjson:amdbuild"]);
+	grunt.registerTask("deploy", ["copy:deploy"]);
 };
