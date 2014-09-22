@@ -14,20 +14,15 @@ module.exports = function (config) {
 	var context = "layer" + i;
 	i++;
 
-	requirejs.config({
-		//Pass the top-level main.js/index.js require
-		//function to requirejs so that node modules
-		//are loaded relative to the top-level JS file.
-		nodeRequire: require,
-		isBuild: true,
-		config: {
-			"requirejs-dplugins/has": {
-				builder: true
-			}
-		},
-		inlineText: true,
-		context: context
-	});
+	// Add requirejs build settings.
+	config.inlineText = config.inlineText || true;
+	config.isBuild = true;
+	config.config = {
+		"requirejs-dplugins/has": {
+			builder: true
+		}
+	};
+	config.nodeRequire = require;
 
 	// Set up global config
 	requirejs.config(config);
