@@ -13,7 +13,7 @@ module.exports = function (grunt) {
 	var outprop = "amdoutput";
 
 	// The requirejs baseUrl.
-	var baseUrl =  "./";
+	var baseUrl = "./";
 
 	// Deployment directory.
 	var deploydir = "deploy/";
@@ -27,8 +27,7 @@ module.exports = function (grunt) {
 			inlineText: true,
 
 			// Here goes the config for the amd plugins build process (has, i18n, ecma402...).
-			config: {
-			}
+			config: {}
 		},
 
 		// The common build config

@@ -1,21 +1,13 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern/dojo/node!requirejs',
 	'intern/dojo/node!fs'
-], function (registerSuite, assert, requirejs, fs) {
+], function (registerSuite, assert, fs) {
 	// Workaround problem with relative paths and dojo/node
 	var getUtils = require.nodeRequire("../../../tasks/lib/utils");
 	var getModules = require.nodeRequire("../../../tasks/lib/modules");
 
 	var utils = getUtils({
-		baseUrl: "./",
-		packages: [{
-			name: "modules",
-			location: "tests/modules"
-		}]
-	});
-	requirejs.config({
 		baseUrl: "./",
 		packages: [{
 			name: "modules",
@@ -29,7 +21,7 @@ define([
 		name: 'normalize',
 
 		'no reference': function () {
-			var lib = getModules(requirejs, utils);
+			var lib = getModules(utils, console.log);
 			assert.strictEqual(lib.getNormalize()("./toto"),
 				"toto",
 				"./ is top level");
@@ -42,7 +34,7 @@ define([
 		},
 
 		'with reference': function () {
-			var lib = getModules(requirejs, utils);
+			var lib = getModules(utils, console.log);
 			assert.strictEqual(lib.getNormalize("titi/blabla")("./toto"),
 				"titi/toto",
 				"./ is relative to titi");
@@ -59,7 +51,7 @@ define([
 		name: 'others',
 
 		'getModuleFromMid': function () {
-			var lib = getModules(requirejs, utils, null, function () {});
+			var lib = getModules(utils, console.log);
 			var mod1 = lib.getModuleFromMid("modules/custNorm!toto");
 			assert.strictEqual(mod1.mid,
 				"modules/custNorm",

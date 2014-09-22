@@ -10,7 +10,7 @@ module.exports = function (grunt) {
 	var parseLayer = require(libDir + "parseLayer");
 	var modulesLib = require(libDir + "modules");
 	var pluginsLib = require(libDir + "plugins");
-	var requirejs = require(libDir + "requirejs");
+	var getRequirejs = require(libDir + "requirejs");
 
 	grunt.registerTask("amddepsscan", function (layerName, buildCfg, loaderCfg) {
 		var done = this.async();
@@ -29,9 +29,10 @@ module.exports = function (grunt) {
 			loaderConfig = {};
 		}
 
+		var requirejs = getRequirejs(grunt.config(loaderCfg));
 		var utils = getUtils(loaderConfig);
 
-		var lib = modulesLib(requirejs, utils, grunt.fail.warn);
+		var lib = modulesLib(utils, grunt.fail.warn);
 		var pE = getParseExclude();
 
 		var layer = layersMap[layerName];
@@ -202,7 +203,6 @@ module.exports = function (grunt) {
 		}
 
 		// Use requirejs lib to avoid code duplication.
-		requirejs.config(grunt.config(loaderCfg));
-		requirejs.tools.useLib(task);
+		require("requirejs").tools.useLib(task);
 	});
 };

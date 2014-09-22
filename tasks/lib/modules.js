@@ -1,6 +1,6 @@
-module.exports = function (requirejs, utils, warn) {
+module.exports = function (utils, warn) {
 	"use strict";
-	var fs = require('fs');
+	var fs = require("fs");
 
 	var cache = {};
 

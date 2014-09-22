@@ -6,7 +6,7 @@ module.exports = function (grunt) {
 	var modulesLib = require(libDir + "modules");
 	var pluginsLib = require(libDir + "plugins");
 	var getUtils = require(libDir + "utils");
-	var requirejs = require(libDir + "requirejs");
+	var getRequirejs = require(libDir + "requirejs");
 
 	function getJsModules(layer) {
 		function negate(pattern) {
@@ -33,9 +33,10 @@ module.exports = function (grunt) {
 			loaderConfig = {};
 		}
 
+		var requirejs = getRequirejs(grunt.config(loaderCfg));
 		var utils = getUtils(loaderConfig);
 
-		var lib = modulesLib(requirejs, utils, grunt.fail.warn);
+		var lib = modulesLib(utils, grunt.fail.warn);
 
 		var modulesList = getJsModules(layer)
 			.map(lib.getModuleFromPath);
@@ -72,7 +73,6 @@ module.exports = function (grunt) {
 		}
 
 		// Use requirejs lib to avoid code duplication.
-		requirejs.config(grunt.config(loaderCfg));
-		requirejs.tools.useLib(task);
+		require("requirejs").tools.useLib(task);
 	});
 };
