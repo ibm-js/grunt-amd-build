@@ -40,8 +40,7 @@ module.exports = function (utils, warn) {
 			cache[mid] = {
 				mid: mid,
 				filepath: path,
-				content: readFile(path),
-				resources: []
+				content: readFile(path)
 			};
 		}
 		return cache[mid];

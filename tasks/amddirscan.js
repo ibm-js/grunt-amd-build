@@ -23,8 +23,15 @@ module.exports = function (grunt) {
 
 	grunt.registerTask("amddirscan", function (layerName, buildCfg, loaderCfg) {
 		var done = this.async();
-		var buildConfig = normalizeCfg.build(grunt.config(buildCfg));
-		var layer = buildConfig.layersByName[layerName];
+
+		var buildConfig = grunt.config(buildCfg);
+		if (!buildConfig) {
+			grunt.fail.warn("No build config was found.");
+			buildConfig = {};
+		}
+		buildConfig = normalizeCfg.build(buildConfig);
+		var layersMap = buildConfig.layersByName;
+		var layer = layersMap[layerName];
 		var modules = layer.modules;
 
 		var loaderConfig = grunt.config(loaderCfg);

@@ -22,6 +22,8 @@ module.exports = function (grunt) {
 		}
 		buildConfig = normalizeCfg.build(buildConfig);
 		var layersMap = buildConfig.layersByName;
+		var layer = layersMap[layerName];
+		var modules = layer.modules;
 
 		var loaderConfig = grunt.config(loaderCfg);
 		if (!loaderConfig) {
@@ -34,9 +36,6 @@ module.exports = function (grunt) {
 
 		var lib = modulesLib(utils, grunt.fail.warn);
 		var pE = getParseExclude();
-
-		var layer = layersMap[layerName];
-		var modules = layer.modules;
 
 		function initExclude(exclude, excludeShallow, getDeps, getModuleFromMid) {
 			exclude = pE.excludeLayerDeps(exclude, layersMap, getModuleFromMid);

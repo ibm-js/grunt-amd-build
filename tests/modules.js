@@ -82,9 +82,6 @@ define([
 			assert.strictEqual(mod1.content,
 				contentCustNorm,
 				"The file should be found");
-			assert.strictEqual(mod1.resources.length,
-				0,
-				"There is no resource");
 
 			var mod2 = lib.getModuleFromPath(path);
 			assert.strictEqual(mod1,
