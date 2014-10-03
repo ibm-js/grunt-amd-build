@@ -55,6 +55,9 @@ module.exports = function (cfg) {
 		/* Remove jshint warning for the bad indentation @l.96 because of the named for-loop. */
 		/* jshint -W015 */
 		normalize: function (name, baseName, applyMap) {
+			var parts = name.split("!");
+			name = parts[0];
+
 			var pkgMain, mapValue, nameParts, i, j, nameSegment, lastIndex,
 				foundMap, foundI, foundStarMap, starI, normalizedBaseParts,
 				baseParts = (baseName && baseName.split('/')),
@@ -139,6 +142,10 @@ module.exports = function (cfg) {
 			// If the name points to a package's name, use
 			// the package main instead.
 			pkgMain = getOwn(config.pkgs, name);
+
+			// Restore plugin
+			parts[0] = name;
+			name = parts.join("!");
 
 			return pkgMain ? pkgMain : name;
 		},
