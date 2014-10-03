@@ -1,0 +1,26 @@
+{
+	"myapp/src": {
+		"../bar-mapped": true,
+		"dojo/Deferred": true,
+		"dojo/_base/config": true,
+		"dojo/_base/kernel": true,
+		"dojo/_base/lang": true,
+		"dojo/errors/CancelError": true,
+		"dojo/errors/create": true,
+		"dojo/has": true,
+		"dojo/promise/Promise": true,
+		"dojo/sniff": true,
+		"myapp/src": true,
+		"mypackage/bar": true,
+		"mypackage/foo": true,
+		"requirejs-dplugins/css": true,
+		"requirejs-dplugins/has": true,
+		"requirejs-dplugins/i18n": true,
+		"requirejs-dplugins/i18n!myapp/nls/en/bundleB": true,
+		"requirejs-dplugins/i18n/build": true,
+		"requirejs-dplugins/i18n/common": true,
+		"requirejs-dplugins/i18n/parentLocale": true,
+		"requirejs-text/text": true,
+		"requirejs-text/text!myapp/msg.txt": true
+	}
+}

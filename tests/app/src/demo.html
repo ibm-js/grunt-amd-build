@@ -1,0 +1,18 @@
+﻿<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<script src="./bower_components/requirejs/require.js"></script>
+		<script type="text/javascript">
+			var build = window.location.search.substring(1);
+			build = build ? "-" + build : "";
+			require(["requirejs-config" + build], function(){
+				require(["myapp/src"], function(src){
+					src.log();
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div id="main"></div>
+	</body>
+</html>

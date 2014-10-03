@@ -1,0 +1,1 @@
+define("myapp/nls/bundleA",{"root":{"MSG":"Root Text from Bundle A"},"fr":true,"fr-fr":true});define('myapp/nls/src_root', true);

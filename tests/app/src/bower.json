@@ -1,0 +1,28 @@
+{
+	"name": "demo-amd-build",
+	"version": "0.1.0",
+	"description": "A simple amd application to explain how to use the grunt-amd-build grunt plugin",
+	"main": "demo.html",
+	"keywords": [
+		"grunt-amd-build",
+		"amd",
+		"build"
+	],
+	"license": "BSD 3-clause",
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"test",
+		"tests"
+	],
+	"dependencies": {
+		"requirejs": "2.1.15",
+		"requirejs-text": "2.0.12",
+		"requirejs-dplugins": "0.3.0-alpha",
+		"dojo": "1.10.1"
+	},
+	"resolutions": {
+		"dojo": "1.10.1"
+	}
+}

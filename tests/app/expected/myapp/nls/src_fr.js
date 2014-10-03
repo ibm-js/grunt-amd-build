@@ -1,0 +1,1 @@
+define("myapp/nls/fr/bundleA",{"MSG":"Fr from Bundle A","_flattened":true,"_pseudoRoot":{"fr-fr":true}});define('myapp/nls/src_fr', true);
