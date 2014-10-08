@@ -92,6 +92,33 @@ define([
 			});
 			assert.strictEqual(config.paths.could, "be any string", "paths should just be copied");
 
+		},
+		'shim': function () {
+			config = normalizeConfig.loader({
+				shim: {
+					"test": {
+						deps: ["toto", "titi"]
+					}
+				}
+			});
+			assert.sameMembers(config.shim.test.deps, ["toto", "titi"], "deps should just be copied");
+
+			config = normalizeConfig.loader({
+				shim: {
+					"test": {
+						exports: "tata"
+					}
+				}
+			});
+			assert.strictEqual(config.shim.test.exports, "tata", "exports should just be copied");
+
+
+			config = normalizeConfig.loader({
+				shim: {
+					"test": ["toto", "titi"]
+				}
+			});
+			assert.sameMembers(config.shim.test.deps, ["toto", "titi"], "short notation for deps should be expanded");
 		}
 	});
 

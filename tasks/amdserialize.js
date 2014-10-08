@@ -19,6 +19,14 @@ module.exports = function (grunt) {
 			rel: []
 		};
 
+		layerConfig.shim.forEach(function (shim) {
+			var absPath = dir + shim.filepath;
+
+			grunt.file.write(absPath, shim.content);
+			modulesFiles.abs.push(absPath);
+			modulesFiles.rel.push(shim.filepath);
+		});
+
 		lang.forEachModules(layerConfig.modules, layerName, function (module) {
 			if (!module.filepath) {
 				grunt.fail.warn("Undefined Path " + module.mid);

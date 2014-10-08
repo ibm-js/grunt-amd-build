@@ -18,14 +18,15 @@ require.config({
 		"css": "../css",
 		"mypackage/foo": "../patch/foo",
 		"angular": "angular/angular",
-		"angular-loader": "angular-loader/angular-loader"
+		"angular-loader": "angular-loader/angular-loader",
+		"jquery": "jquery/dist/jquery"
 	},
 	shim: {
-		'angular': {
-			exports: 'angular',
-			deps: ['angular-loader']
+		"angular": {
+			exports: "angular",
+			deps: ["angular-loader", "jquery"]
 		},
-		'angular-loader': {
+		"angular-loader": {
 		}
 	},
 	

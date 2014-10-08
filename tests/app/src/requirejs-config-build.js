@@ -1,5 +1,5 @@
 require.config({
-	baseUrl: "./build/bower_components/",
+	baseUrl: "../results/bower_components/",
 
 	packages: [{
 		name: "myapp",
@@ -17,9 +17,19 @@ require.config({
 
 	paths: {
 		"css": "../css",
-		"mypackage/foo": "../patch/foo"
+		"mypackage/foo": "../patch/foo",
+		"angular": "angular/angular",
+		"angular-loader": "angular-loader/angular-loader",
+		"jquery": "jquery/dist/jquery"
 	},
-
+	shim: {
+		"angular": {
+			exports: "angular",
+			deps: ["angular-loader", "jquery"]
+		},
+		"angular-loader": {
+		}
+	},
 	config: {
 		"requirejs-dplugins/i18n": {
 			locale: "fr-fr"

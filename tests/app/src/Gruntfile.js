@@ -29,7 +29,17 @@ module.exports = function (grunt) {
             map: { 'mypackage/foo': { 'mypackage/bar': '../bar-mapped' } },
             paths: {
                 'css': '../css',
-                'mypackage/foo': '../patch/foo'
+                'mypackage/foo': '../patch/foo',
+                'angular': 'angular/angular',
+                'angular-loader': 'angular-loader/angular-loader',
+				'jquery': 'jquery/dist/jquery'
+            },
+            shim: {
+                'angular': {
+                    exports: 'angular',
+                    deps: ['angular-loader', 'jquery']
+                },
+                'angular-loader': {}
             },
             config: { 'requirejs-dplugins/i18n': { locale: 'fr-fr' } }
         },
@@ -43,7 +53,7 @@ module.exports = function (grunt) {
             dir: outdir
         },
         concat: {
-            options: { separator: ';' },
+            options: { separator: ';\n' },
             dist: common
         },
         copy: {
@@ -68,6 +78,7 @@ module.exports = function (grunt) {
     grunt.registerTask('amdbuild', function (amdloader) {
         var name = this.name, layers = grunt.config(name).layers;
         layers.forEach(function (layer) {
+			grunt.task.run("amdshim:" + layer.name + ":" + name + ":" + amdloader);
 			grunt.task.run('amddepsscan:' + layer.name + ':' + name + ':' + amdloader);
 			grunt.task.run('amdserialize:' + layer.name + ':' + name + ':' + outprop);
             grunt.task.run('concat');

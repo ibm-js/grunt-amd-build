@@ -20,9 +20,20 @@ module.exports = function (grunt) {
 		var content = "{\n";
 		lang.eachProp(buildConfig.layersByName, function (name, layer) {
 			content += '\t"' + name + '": {\n';
+			content += '\t\t"modules": {\n';
 			Object.keys(layer.modules).sort().forEach(function (module) {
-				content += '\t\t"' + module + '": true,\n';
+				content += '\t\t\t"' + module + '": true,\n';
 			});
+			content = removeTraillingComa(content) + (layer.shim ? '\t\t},\n' : '\t\t}\n');
+
+			if (layer.shim) {
+				content += '\t\t"shims": [\n';
+				layer.shim.forEach(function (value) {
+					content += '\t\t\t"' + value.filepath + '",\n';
+				});
+				content = removeTraillingComa(content) + '\t\t]\n';
+			}
+
 
 			content = removeTraillingComa(content) + '\t},\n';
 		});
@@ -30,6 +41,6 @@ module.exports = function (grunt) {
 		content = removeTraillingComa(content) + '}\n';
 
 		var dir = normalizeCfg.normalizeUrl(config.dir || "./");
-		grunt.file.write(dir + "buildReport.json", content);
+		grunt.file.write(dir + "buildReport.json", grunt.util.normalizelf(content));
 	});
 };

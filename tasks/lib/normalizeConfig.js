@@ -41,7 +41,8 @@ module.exports = (function () {
 				header: "",
 				modules: {},
 				plugins: {},
-				pluginsFiles: {}
+				pluginsFiles: {},
+				shim: []
 			};
 		},
 
@@ -114,6 +115,18 @@ module.exports = (function () {
 					config.paths[path] = location.length > 2 ? location.replace(/^\.\//, "") : location;
 				});
 			});
+
+			if (config.shim) {
+				eachProp(config.shim, function (id, value) {
+					// Normalize the structure
+					if (Array.isArray(value)) {
+						value = {
+							deps: value
+						};
+					}
+					config.shim[id] = value;
+				});
+			}
 
 			config._normalized = true;
 

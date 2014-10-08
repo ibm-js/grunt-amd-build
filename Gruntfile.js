@@ -62,7 +62,13 @@ module.exports = function (grunt) {
 				done(error);
 				return;
 			}
-			grunt.util.spawn({cmd: "npm", args: ["install"], opts: {cwd: "tests/app/src"}}, startBuild);
+			grunt.util.spawn({
+				cmd: "npm",
+				args: ["install"],
+				opts: {
+					cwd: "tests/app/src"
+				}
+			}, startBuild);
 		}
 
 		function startBuild(error, npmResults) {
@@ -71,12 +77,22 @@ module.exports = function (grunt) {
 				done(error);
 				return;
 			}
-			grunt.util.spawn({cmd: "grunt", args: ["build"], opts: {cwd: "tests/app/src"}}, checkBuild);
+			grunt.util.spawn({
+				cmd: "grunt",
+				args: ["build"],
+				opts: {
+					cwd: "tests/app/src"
+				}
+			}, checkBuild);
 		}
 
 		function checkBuild(error, buildResult) {
-			var expected = grunt.file.expand({filter: "isFile"}, ["tests/app/expected/**/*"]).sort();
-			var results = grunt.file.expand({filter: "isFile"}, ["tests/app/results/**/*"]).sort();
+			var expected = grunt.file.expand({
+				filter: "isFile"
+			}, ["tests/app/expected/**/*"]).sort();
+			var results = grunt.file.expand({
+				filter: "isFile"
+			}, ["tests/app/results/**/*"]).sort();
 
 			if (error !== null) {
 				grunt.log.writeln(buildResult.stdout);
@@ -85,7 +101,10 @@ module.exports = function (grunt) {
 			}
 
 			var testResult = expected.every(function (value, index) {
-				var test = (grunt.file.read(value) === grunt.file.read(results[index]));
+				function getFile(path) {
+					return grunt.util.normalizelf(grunt.file.read(path));
+				}
+				var test = (getFile(value) === getFile(results[index]));
 				if (!test) {
 					grunt.log.writeln(JSON.stringify(expected, null, "\t"));
 					grunt.log.writeln(JSON.stringify(results, null, "\t"));
@@ -98,7 +117,13 @@ module.exports = function (grunt) {
 			done(testResult);
 		}
 
-		grunt.util.spawn({cmd: "bower", args: ["install"], opts: {cwd: "tests/app/src"}}, npmInstall);
+		grunt.util.spawn({
+			cmd: "bower",
+			args: ["install"],
+			opts: {
+				cwd: "tests/app/src"
+			}
+		}, npmInstall);
 	});
 
 	// These plugins provide necessary tasks.
