@@ -12,16 +12,11 @@ module.exports = function (grunt) {
 	// list of files to include in the layer.
 	var outprop = "amdoutput";
 
-	// The requirejs baseUrl.
-	var baseUrl = "./";
-
-	// Deployment directory.
-	var deploydir = "deploy/";
-
 	grunt.initConfig({
 		// The loader config should go here.
 		amdloader: {
-			baseUrl: baseUrl,
+			// Everything should be relative to baseUrl
+			baseUrl: "./",
 
 			// Enable build of requirejs-text/text
 			inlineText: true,
@@ -76,13 +71,6 @@ module.exports = function (grunt) {
 				src: "<%= " + outprop + ".plugins.rel %>",
 				dest: outdir,
 				dot: true
-			},
-			deploy: {
-				expand: true,
-				cwd: outdir + baseUrl,
-				src: "*/*",
-				dest: deploydir,
-				dot: true
 			}
 		},
 
@@ -117,5 +105,4 @@ module.exports = function (grunt) {
 
 	// Default task.
 	grunt.registerTask("build", ["clean:erase", "amdbuild:amdloader", "amdreportjson:amdbuild"]);
-	grunt.registerTask("deploy", ["copy:deploy"]);
 };
