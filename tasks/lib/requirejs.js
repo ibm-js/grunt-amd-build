@@ -17,12 +17,11 @@ module.exports = function (config) {
 	// Add requirejs build settings.
 	config.inlineText = config.inlineText || true;
 	config.isBuild = true;
-	config.config = {
-		"requirejs-dplugins/has": {
-			builder: true
-		}
-	};
 	config.nodeRequire = require;
+
+	config.config = config.config || {};
+	config.config["requirejs-dplugins/has"] = config.config["requirejs-dplugins/has"] || {};
+	config.config["requirejs-dplugins/has"].builder = true;
 
 	// Set up global config
 	requirejs.config(config);
