@@ -1,7 +1,7 @@
 {
 	"name": "grunt-amd-build",
 	"description": "Grunt plugin to build AMD applications.",
-	"version": "0.8.0-alpha2",
+	"version": "0.8.0",
 	"homepage": "https://github.com/ibm-js/grunt-amd-build",
 	"repository": {
 		"type": "git",
