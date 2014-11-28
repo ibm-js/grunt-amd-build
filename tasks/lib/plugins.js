@@ -132,7 +132,7 @@ module.exports = function (requirejs, layer, utils, toTransport, buildConfig) {
 			Object.keys(onLayerEndCb).forEach(function (pluginName) {
 				onLayerEndCb[pluginName](write, data);
 			});
-			onLayerEndCb = [];
+			onLayerEndCb = {};
 		},
 
 		splitPluginMid: splitPluginMid
