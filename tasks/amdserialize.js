@@ -44,8 +44,13 @@ module.exports = function (grunt) {
 			// Process images included in css with url() param.
 			if (/.css$/.test(filepath)) {
 				var fileDir = filepath.replace(/[^\/]*$/, "");
-				var urlRE = /url\(['"]?([^\)'"]*)/g;
+				var urlRE = /url\(['"]?([^\)'"\?#]*)/g;
 				var match = null;
+
+				// This is needed in case of relative path using ../, because grunt.file.copy while try to go down to
+				// fileDir before going up with ../ So if fileDir does not exist grunt.file.copy fails.
+				grunt.file.mkdir(fileDir);
+
 				// Extra parenthesis in the while condition to silence jshint.
 				// The assignment is required here to access the matched groups of a global regexp.
 				while ((match = urlRE.exec(content))) {
