@@ -53,7 +53,7 @@ module.exports = function (grunt) {
 
 				// Extra parenthesis in the while condition to silence jshint.
 				// The assignment is required here to access the matched groups of a global regexp.
-				while ((match = urlRE.exec(content))) {
+				while (((match = urlRE.exec(content)) && (match[1].lastIndexOf('data', 0) !== 0))) {
 					var src = fileDir + match[1];
 					grunt.file.copy(src, dir + src, {
 						encoding: null
