@@ -77,6 +77,15 @@ module.exports = function (grunt) {
 				done(error);
 				return;
 			}
+
+			// replace grunt-amd-build sources with current version
+			var dest =  "tests/app/src/node_modules/grunt-amd-build/";
+			grunt.file.expandMapping(["tasks/**/*"], dest, {filter: "isFile"}).forEach(function (map) {
+				grunt.file.copy(map.src, map.dest, {encoding: null});
+			});
+
+			// remove previous output if any
+			grunt.file.delete("tests/app/results");
 			grunt.util.spawn({
 				cmd: "grunt",
 				args: ["build"],
