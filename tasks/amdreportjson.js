@@ -20,20 +20,34 @@ module.exports = function (grunt) {
 		var content = "{\n";
 		lang.eachProp(buildConfig.layersByName, function (name, layer) {
 			content += '\t"' + name + '": {\n';
-			content += '\t\t"modules": {\n';
-			Object.keys(layer.modules).sort().forEach(function (module) {
-				content += '\t\t\t"' + module + '": true,\n';
-			});
-			content = removeTraillingComa(content) + (layer.shim ? '\t\t},\n' : '\t\t}\n');
 
-			if (layer.shim) {
+			if (layer.modules && Object.keys(layer.modules).length > 0) {
+				content += '\t\t"modules": {\n';
+				Object.keys(layer.modules).sort().forEach(function (module) {
+					content += '\t\t\t"' + module + '": true,\n';
+				});
+				content = removeTraillingComa(content) + '\t\t},\n';
+			}
+
+			if (layer.plugins && Object.keys(layer.plugins).length > 0) {
+				content += '\t\t"plugins": {\n';
+				Object.keys(layer.plugins).sort().forEach(function (plugin) {
+					content += '\t\t\t"' + plugin + '": {\n';
+					layer.plugins[plugin].sort().forEach(function (resource) {
+						content += '\t\t\t\t"' + resource + '": true,\n';
+					});
+					content = removeTraillingComa(content) + '\t\t\t},\n';
+				});
+				content = removeTraillingComa(content) + '\t\t},\n';
+			}
+
+			if (layer.shim && layer.shim.length > 0) {
 				content += '\t\t"shims": [\n';
 				layer.shim.forEach(function (value) {
 					content += '\t\t\t"' + value.filepath + '",\n';
 				});
-				content = removeTraillingComa(content) + '\t\t]\n';
+				content = removeTraillingComa(content) + '\t\t],\n';
 			}
-
 
 			content = removeTraillingComa(content) + '\t},\n';
 		});

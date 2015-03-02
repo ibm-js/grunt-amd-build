@@ -24,6 +24,18 @@
 			"requirejs-text/text": true,
 			"requirejs-text/text!myapp/msg.txt": true
 		},
+		"plugins": {
+			"requirejs-dplugins/css": {
+				"css/src.css": true
+			},
+			"requirejs-dplugins/i18n": {
+				"myapp/nls/bundleA": true,
+				"myapp/nls/en/bundleB": true
+			},
+			"requirejs-text/text": {
+				"myapp/msg.txt": true
+			}
+		},
 		"shims": [
 			"./bower_components/jquery/dist/jquery.js",
 			"./bower_components/angular-loader/angular-loader.js",
