@@ -23,6 +23,12 @@ module.exports = (function () {
 			if (modules.hasOwnProperty(layerName)) {
 				func(modules[layerName]);
 			}
+		},
+		concatMids: function (a, b) {
+			return {
+				modules: a.modules.concat(b.modules),
+				plugins: a.plugins.concat(b.plugins)
+			};
 		}
 	};
 })();

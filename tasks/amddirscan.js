@@ -48,35 +48,38 @@ module.exports = function (grunt) {
 		var modulesList = getJsModules(layer)
 			.map(lib.getModuleFromPath);
 
+		if (!modulesList.length) {
+			grunt.fail.warn("No file found to include in " + layerName);
+		}
+
 		function task(req) {
-			req(["parse", "transform"], function (parse, transform) {
-				// Simple wrapper to simplify the call of toTransport.
-				function toTransport(moduleName, filepath, content) {
-					return transform.toTransport(null, moduleName, filepath, content);
+			var parse = req("parse");
+			var transform = req("transform");
+
+			// Simple wrapper to simplify the call of toTransport.
+			function toTransport(moduleName, filepath, content) {
+				return transform.toTransport(null, moduleName, filepath, content);
+			}
+
+			// Create the late library as everything needed is now here.
+			var plugins = pluginsLib(requirejs, layer, utils, lib, toTransport, buildConfig);
+
+			modulesList.forEach(function (current) {
+				if (current.content) {
+					current.content = toTransport(current.mid, current.filepath, current.content);
+					modules[current.mid] = current;
+
+					var normalize = lib.getNormalize(current.mid);
+					var names = lib.filterMids(parse.findDependencies(current.mid, current.content).map(normalize));
+					plugins.process(names, normalize);
 				}
-
-				// Create the processResources function as everything needed is now here.
-				var plugins = pluginsLib(requirejs, layer, utils, toTransport, buildConfig);
-
-				modulesList.forEach(function (current) {
-					if (current.content) {
-						current.content = toTransport(current.mid, current.filepath, current.content);
-						modules[current.mid] = current;
-
-						parse.findDependencies(current.mid, current.content)
-							.map(lib.getNormalize(current.mid))
-							.forEach(function (mid) {
-								plugins.process(mid, lib.getNormalize(current.mid));
-							});
-					}
-				});
-
-				plugins.onLayerEnd();
-
-				grunt.config([buildCfg], buildConfig);
-
-				done(true);
 			});
+
+			plugins.onLayerEnd();
+
+			grunt.config([buildCfg], buildConfig);
+
+			done(true);
 		}
 
 		// Use requirejs lib to avoid code duplication.

@@ -152,9 +152,11 @@ define([
 			assert.isArray(config.layers[0].exclude, "empty config should generate exclude array");
 			assert.isArray(config.layers[0].excludeShallow, "empty config should generate excludeShallow array");
 			assert.isArray(config.layers[0].excludeFiles, "empty config should generate excludeFiles array");
+			assert.isArray(config.layers[0].excludeLayers, "empty config should generate excludeLayers array");
 			assert.isArray(config.layers[0].include, "empty config should generate include array");
 			assert.isArray(config.layers[0].includeShallow, "empty config should generate includeShallow array");
 			assert.isArray(config.layers[0].includeFiles, "empty config should generate includeFiles array");
+			assert.isArray(config.layers[0].includeLayers, "empty config should generate includeLayers array");
 			assert.strictEqual(config.layers[0].outputPath, "testlay.js", "default outputPath is layer name + .js");
 			assert.strictEqual(config.layers[0].header, "", "default header is empty");
 			assert.isObject(config.layers[0].modules, "modules should be initialized as an empty object");
@@ -212,6 +214,22 @@ define([
 				}]
 			});
 			assert.strictEqual(config.layers[0].excludeFiles[0], "testex", "excludeFiles should not be overwritten");
+
+			config = normalizeConfig.build({
+				layers: [{
+					name: "testlay",
+					includeLayers: ["testinc"]
+				}]
+			});
+			assert.strictEqual(config.layers[0].includeLayers[0], "testinc", "includeLayers should not be overwritten");
+
+			config = normalizeConfig.build({
+				layers: [{
+					name: "testlay",
+					excludeLayers: ["testex"]
+				}]
+			});
+			assert.strictEqual(config.layers[0].excludeLayers[0], "testex", "excludeLayers should not be overwritten");
 
 			config = normalizeConfig.build({
 				layers: [{

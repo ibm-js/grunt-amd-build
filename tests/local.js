@@ -11,8 +11,7 @@ define({
 	suites: [
 		"tests/config",
 		"tests/modulesStack",
-		"tests/modules",
-		"tests/parseExclude"
+		"tests/modules"
 	],
 
 	// A regular expression matching URLs to files that should not be included in code coverage analysis

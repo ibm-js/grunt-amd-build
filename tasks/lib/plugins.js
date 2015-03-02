@@ -1,4 +1,4 @@
-module.exports = function (requirejs, layer, utils, toTransport, buildConfig) {
+module.exports = function (requirejs, layer, utils, lib, toTransport, buildConfig) {
 
 	// Add processed resources to the layer data for logging
 	// and to avoid multiple processing of the same resource.
@@ -15,29 +15,8 @@ module.exports = function (requirejs, layer, utils, toTransport, buildConfig) {
 		return buildConfig.buildPlugins && buildConfig.runtimePlugins.indexOf(pluginName) === -1;
 	}
 
-	function isResourceToProcess(pluginName, resource) {
-		return !layer.plugins[pluginName] || layer.plugins[pluginName].indexOf(resource) === -1;
-	}
-
-	// This method is private.
-	//
-	// Take a module id and return an object.
-	// If the module id is a plugin (ie. contains a !) the function returns
-	// the plugin name in mid and the resource in resource.
-	// If the module id is a regular module, the function returns
-	// the module name in mid and resource is an empty string.
-	function splitPluginMid(mid) {
-		var index = mid.indexOf('!');
-		if (index === -1) {
-			return {
-				mid: mid
-			};
-		} else {
-			return {
-				mid: mid.substring(0, index),
-				resource: mid.substring(index + 1, mid.length)
-			};
-		}
+	function isAlreadyProcessed(name) {
+		return layer.plugins[name.mid] && layer.plugins[name.mid].indexOf(name.resource) >= 0;
 	}
 
 	function write(content) {
@@ -60,40 +39,75 @@ module.exports = function (requirejs, layer, utils, toTransport, buildConfig) {
 		writeFile(filepath, toTransport(moduleName, filepath, content));
 	};
 
+	function getPlugin(mid) {
+		// Load the plugin.
+		var plugin = requirejs(mid);
+
+		// Replace plugin by plugin builder if any.
+		var pluginBuilder = plugin.pluginBuilder;
+		if (pluginBuilder) {
+			pluginBuilder = utils.normalize(pluginBuilder, mid, true);
+			plugin = requirejs(pluginBuilder);
+		}
+		return {
+			plugin: plugin,
+			pluginBuilder: pluginBuilder
+		};
+	}
+
+	function processHelper(name, normalize, isResourceToProcess) {
+		// Normalize resource.
+		name.resource = pluginLib.normalizeResource(name, normalize);
+
+		// Check if resource should be processed
+		if ((isResourceToProcess && !isResourceToProcess(name)) || isAlreadyProcessed(name)) {
+			return [];
+		}
+
+		// Load the plugin.
+		var plugin = getPlugin(name.mid);
+		var pluginBuilder = plugin.pluginBuilder;
+		plugin = plugin.plugin;
+
+		// List of mids to include in the layer
+		var pluginModules = [];
+
+		function addModules(modules) {
+			var names = lib.filterMids(modules.map(normalize));
+			pluginModules = pluginModules.concat(pluginLib.process(names, normalize, isResourceToProcess));
+		}
+
+
+		requirejs((pluginBuilder || name.mid) + "!" + name.resource);
+
+		// Call write method if any
+		plugin.write && plugin.write(name.mid, name.resource, write, {});
+
+		// Call writeFile method if any
+		plugin.writeFile && plugin.writeFile(name.mid, name.resource, requirejs, writeFile, {});
+
+		// Call addModules method if any
+		plugin.addModules && plugin.addModules(name.mid, name.resource, addModules, {});
+
+		// Store the resource that was just processed.
+		addPluginResource(name.mid, name.resource);
+
+		// Store the onLayerEnd function from the plugin for layer use.
+		if (plugin.onLayerEnd) {
+			onLayerEndCb[name.mid] = plugin.onLayerEnd;
+		}
+
+		return pluginModules;
+	}
+
 	var onLayerEndCb = {};
 
 	var pluginLib = {
-		process: function (mid, normalize) {
-			var name = splitPluginMid(mid);
-			var pluginName = name.mid;
+		normalizeResource: function (name, normalize) {
 			var resource = name.resource;
-			if (resource === undefined || !isPluginToProcess(pluginName) || !isResourceToProcess(resource)) {
-				return [];
-			}
 
 			// Load the plugin.
-			var plugin = requirejs(pluginName);
-
-			// List of modules to include in the layer, start with the plugin itself.
-			var pluginModules = [pluginName];
-
-			function addModules(modules) {
-				modules = modules.map(function (mid) {
-					mid = normalize(mid);
-					var modulesToAdd = pluginLib.process(mid, normalize);
-					pluginModules = pluginModules.concat(modulesToAdd);
-					//return only the module id.
-					return splitPluginMid(mid).mid;
-				});
-				pluginModules = pluginModules.concat(modules);
-			}
-
-			// Replace plugin by plugin builder if any.
-			var pluginBuilder = plugin.pluginBuilder;
-			if (pluginBuilder) {
-				pluginBuilder = utils.normalize(pluginBuilder, pluginName, true);
-				plugin = requirejs(pluginBuilder);
-			}
+			var plugin = getPlugin(name.mid).plugin;
 
 			// Normalize resource.
 			if (plugin.normalize) {
@@ -101,27 +115,21 @@ module.exports = function (requirejs, layer, utils, toTransport, buildConfig) {
 			} else {
 				resource = normalize(resource);
 			}
+			return resource;
+		},
 
-			requirejs((pluginBuilder || pluginName) + "!" + resource);
+		process: function (names, normalize, isResourceToProcess) {
+			// Process plugins
+			var pluginDeps = names.plugins.reduce(function (pluginDeps, name) {
+				pluginDeps.push(name.mid);
+				if (isPluginToProcess(name.mid)) {
+					return pluginDeps.concat(processHelper(name, normalize, isResourceToProcess));
+				} else {
+					return pluginDeps;
+				}
+			}, []);
 
-			// Call write method if any
-			plugin.write && plugin.write(pluginName, resource, write, {});
-
-			// Call writeFile method if any
-			plugin.writeFile && plugin.writeFile(pluginName, resource, requirejs, writeFile, {});
-
-			// Call addModules method if any
-			plugin.addModules && plugin.addModules(pluginName, resource, addModules, {});
-
-			// Store the resource that was just processed.
-			addPluginResource(pluginName, resource);
-
-			// Store the onLayerEnd function from the plugin for layer use.
-			if (plugin.onLayerEnd) {
-				onLayerEndCb[pluginName] = plugin.onLayerEnd;
-			}
-
-			return pluginModules;
+			return names.modules.concat(pluginDeps);
 		},
 
 		onLayerEnd: function () {
@@ -133,9 +141,7 @@ module.exports = function (requirejs, layer, utils, toTransport, buildConfig) {
 				onLayerEndCb[pluginName](write, data);
 			});
 			onLayerEndCb = {};
-		},
-
-		splitPluginMid: splitPluginMid
+		}
 	};
 	return pluginLib;
 };

@@ -52,7 +52,7 @@ define([
 
 		'getModuleFromMid': function () {
 			var lib = getModules(utils, console.log);
-			var mod1 = lib.getModuleFromMid("modules/custNorm!toto");
+			var mod1 = lib.getModuleFromMid("modules/custNorm");
 			assert.strictEqual(mod1.mid,
 				"modules/custNorm",
 				"Just the mid");
@@ -63,14 +63,14 @@ define([
 				contentCustNorm,
 				"The file should be found");
 
-			var mod2 = lib.getModuleFromMid("modules/custNorm!titi");
+			var mod2 = lib.getModuleFromMid("modules/custNorm");
 			assert.strictEqual(mod1,
 				mod2,
 				"Second time, the module should come from cache");
 		},
 
 		'getModuleFromPath': function () {
-			var lib = getModules(null, null, null, function () {});
+			var lib = getModules(utils, console.log);
 			var path = "tests/modules/custNorm.js";
 			var mod1 = lib.getModuleFromPath(path);
 			assert.strictEqual(mod1.mid,
@@ -87,6 +87,74 @@ define([
 			assert.strictEqual(mod1,
 				mod2,
 				"Second time, the module should come from cache");
+		},
+
+		'splitPluginMid': function () {
+			var lib = getModules(utils, console.log);
+			var input = ["myapp/plugin", "myapp/plugin!", "myapp/plugin!resource", "myapp/plugin!otherPlugin!resource"];
+			var expected = [
+				{
+					mid: "myapp/plugin",
+					resource: undefined
+				}, {
+					mid: "myapp/plugin",
+					resource: ""
+				}, {
+					mid: "myapp/plugin",
+					resource: "resource"
+				}, {
+					mid: "myapp/plugin",
+					resource: "otherPlugin!resource"
+				}
+			];
+			var result = input.map(lib.splitPluginMid);
+
+			result.forEach(function (name, index) {
+				assert.strictEqual(name.mid, expected[index].mid, "The mid should be extracted correctly");
+				assert.strictEqual(name.resource, expected[index].resource,
+					"The resource should be extracted correctly");
+			});
+		},
+
+		'filterMids': function () {
+			var lib = getModules(utils, console.log);
+			var input = [
+				"myapp/toto",
+				"myapp/toto",
+				"myapp/plugin!",
+				"myapp/titi",
+				"myapp/otherPlugin!resource",
+				"myapp/plugin!otherPlugin!resource",
+				"myapp/tata"
+			];
+			var expected = {
+				modules: [
+					"myapp/toto",
+					"myapp/toto",
+					"myapp/titi",
+					"myapp/tata"
+				],
+				plugins: [{
+					mid: "myapp/plugin",
+					resource: ""
+				}, {
+					mid: "myapp/otherPlugin",
+					resource: "resource"
+				}, {
+					mid: "myapp/plugin",
+					resource: "otherPlugin!resource"
+				}]
+			};
+			var result = lib.filterMids(input);
+
+			assert.sameMembers(result.modules, expected.modules, "The modules list is wrong");
+
+			result.plugins.forEach(function (name, index) {
+				var ref = expected.plugins[index];
+				assert.strictEqual(name.mid, ref.mid, "The mid should be extracted correctly");
+				assert.strictEqual(name.resource, ref.resource,
+					"The resource should be extracted correctly");
+			});
 		}
 	});
 });

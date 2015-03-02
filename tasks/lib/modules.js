@@ -4,10 +4,6 @@ module.exports = function (utils, warn) {
 
 	var cache = {};
 
-	function stripPlugin(mid) {
-		return mid.split("!")[0];
-	}
-
 	// current is a mid.
 	// Return a function that will normalize mid relatively
 	// to current.
@@ -20,7 +16,9 @@ module.exports = function (utils, warn) {
 	// Take a normalized module id and return a module object containing
 	// the module id and the filepath of the module.
 	function getModuleFromMid(mid) {
-		mid = stripPlugin(mid);
+		if (mid.indexOf("!") >= 0) {
+			throw "Method getModuleFromMid called with a plugin mid: " + mid;
+		}
 
 		if (!cache[mid]) {
 			var path = utils.nameToFilepath(mid);
@@ -73,11 +71,50 @@ module.exports = function (utils, warn) {
 		}
 	}
 
+	// Take a module id and return an object.
+	// If the module id is a plugin (ie. contains a !) the function returns
+	// the plugin name in mid and the resource in resource.
+	// If the module id is a regular module, the function returns
+	// the module name in mid and resource is undefined.
+	function splitPluginMid(mid) {
+		var index = mid.indexOf("!");
+		if (index === -1) {
+			return {
+				mid: mid
+			};
+		} else {
+			return {
+				mid: mid.substring(0, index),
+				resource: mid.substring(index + 1, mid.length)
+			};
+		}
+	}
+
+	function filterMids(mids) {
+		return mids.reduce(function (names, mid) {
+			var name = splitPluginMid(mid);
+			if (name.resource === undefined) {
+				// Add module
+				names.modules.push(name.mid);
+			} else {
+				// Add plugin resource
+				names.plugins.push(name);
+			}
+			// Return object for next iteration
+			return names;
+		}, {
+			modules: [],
+			plugins: []
+		});
+	}
+
 	return {
 		getNormalize: getNormalize,
 		getModuleFromMid: getModuleFromMid,
 		getModuleFromPath: getModuleFromPath,
-		warnConflictLayerName: warnConflictLayerName
+		warnConflictLayerName: warnConflictLayerName,
+		splitPluginMid: splitPluginMid,
+		filterMids: filterMids
 	};
 
 };
