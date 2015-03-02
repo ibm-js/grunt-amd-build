@@ -4,6 +4,4 @@ before_script:
   - npm install -g grunt-cli
   - npm install -g bower
 script:
-  - grunt jshint:all
-  - grunt intern:local
-  - grunt fullTest
+  - grunt

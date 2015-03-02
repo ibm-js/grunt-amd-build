@@ -23,7 +23,8 @@
 		"grunt": "~0.4.1",
 		"grunt-jsbeautifier": "~0.2.2",
 		"grunt-lineending": "~0.2.2",
-		"intern": "~1.7.0"
+		"intern": "~1.7.0",
+		"promised-io": "0.3.x"
 	},
 	"peerDependencies": {
 		"grunt": "~0.4.1"
