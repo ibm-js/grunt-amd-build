@@ -1,0 +1,1 @@
+define('myapp/resource.xxx!myapp/plugin',{'myapp/resource.xxx': true});

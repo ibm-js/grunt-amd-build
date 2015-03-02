@@ -1,0 +1,48 @@
+{
+	"myapp/base": {
+		"modules": {
+			"myapp/plugin": true,
+			"myapp/plugin!myapp/other": true,
+			"myapp/plugin!myapp/other1": true,
+			"myapp/plugin!myapp/resource.xxx": true,
+			"myapp/plugin!myapp/resource.xxx1": true,
+			"myapp/src": true,
+			"mypackage/bar": true,
+			"mypackage/foo": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"myapp/other": true,
+				"myapp/resource.xxx": true
+			}
+		}
+	},
+	"myapp/include": {
+		"modules": {
+			"myapp/plugin": true,
+			"myapp/plugin!foo": true,
+			"myapp/plugin!foo1": true,
+			"mypackage/bar": true,
+			"mypackage/foo": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"foo": true
+			}
+		}
+	},
+	"myapp/builder": {
+		"modules": {
+			"myapp/pluginBuilder": true,
+			"myapp/pluginBuilder!foo": true,
+			"myapp/pluginBuilder!foo1": true,
+			"mypackage/bar": true,
+			"mypackage/foo": true
+		},
+		"plugins": {
+			"myapp/pluginBuilder": {
+				"foo": true
+			}
+		}
+	}
+}

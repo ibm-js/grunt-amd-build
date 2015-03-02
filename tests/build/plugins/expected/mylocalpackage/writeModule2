@@ -1,0 +1,1 @@
+define('myapp/other!myapp/plugin',{'myapp/other': true});

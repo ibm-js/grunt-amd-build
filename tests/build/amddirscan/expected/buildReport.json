@@ -1,0 +1,34 @@
+{
+	"myapp/base": {
+		"modules": {
+			"myapp/plugin!myapp/resource.xxx": true,
+			"myapp/plugin!myapp/resource.xxx1": true,
+			"myapp/src": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"myapp/resource.xxx": true
+			}
+		}
+	},
+	"myapp/glob": {
+		"modules": {
+			"myapp/plugin": true,
+			"myapp/plugin!myapp/resource.xxx": true,
+			"myapp/plugin!myapp/resource.xxx1": true,
+			"myapp/pluginBuilder": true,
+			"myapp/src": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"myapp/resource.xxx": true
+			}
+		}
+	},
+	"myapp/exclude": {
+		"modules": {
+			"myapp/plugin": true,
+			"myapp/pluginBuilder": true
+		}
+	}
+}

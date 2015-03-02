@@ -8,7 +8,7 @@ module.exports = function (grunt) {
 		"sample/*.js",
 		"tests/**/*.js",
 		"!**/*_min.js",
-		"!tests/app/**/*"
+		"!tests/build/**/*"
 	];
 
 	// Project configuration.
@@ -53,9 +53,7 @@ module.exports = function (grunt) {
 		},
 
 		buildTests: {
-			paths: [
-				"tests/app"
-			]
+			paths: grunt.file.expand({filter: "isDirectory"}, "tests/build/*")
 		}
 	});
 

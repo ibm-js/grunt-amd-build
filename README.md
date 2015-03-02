@@ -107,6 +107,9 @@ amdbuild: {
 
 * `amdbuild.layers[x].includeShallow`,  `amdbuild.layers[x].excludeShallow` _(Array)_: List of module IDs to include/exclude in/from the layer. Dpendencies of modules listed here will not be included/excluded in/from the layer.
 
+    __Note:__ Plugin resources exclusion is always shallow, even if specified in `exclude`.
+
+
 #### Results
 This task adds the dependencies to the `buildConfig.layers.layerName` object. The modules and the plugins resources are stored separately, in `buildConfig.layers.layerName.modules` and in `buildConfig.layers.layerName.plugins`.
 

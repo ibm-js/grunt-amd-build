@@ -1,0 +1,183 @@
+{
+	"myapp/self": {
+		"modules": {
+			"myapp/self": true,
+			"mypackage/bar": true,
+			"mypackage/foo": true
+		}
+	},
+	"myapp/include": {
+		"modules": {
+			"mypackage/bar": true,
+			"mypackage/foo": true
+		}
+	},
+	"myapp/includeDouble": {
+		"modules": {
+			"mypackage/bar": true,
+			"mypackage/foo": true
+		}
+	},
+	"myapp/includeDoubleDeps": {
+		"modules": {
+			"mypackage/bar": true,
+			"mypackage/foo": true,
+			"mypackage/qux": true
+		}
+	},
+	"myapp/includeShallow": {
+		"modules": {
+			"mypackage/foo": true
+		}
+	},
+	"myapp/includeShallowDouble": {
+		"modules": {
+			"mypackage/foo": true
+		}
+	},
+	"myapp/includeLayer": {
+		"modules": {
+			"mypackage/bar": true,
+			"mypackage/foo": true
+		}
+	},
+	"myapp/includeLayerShallow": {
+		"modules": {
+			"mypackage/foo": true
+		}
+	},
+	"myapp/includeExistingLayer": {
+		"modules": {
+			"mypackage/bar": true,
+			"mypackage/foo": true
+		}
+	},
+	"myapp/excludeLayer": {
+		"modules": {
+			"mypackage/qux": true
+		}
+	},
+	"myapp/excludeLayerShallow": {
+		"modules": {
+			"mypackage/bar": true,
+			"mypackage/qux": true
+		}
+	},
+	"myapp/excludeExistingLayer": {
+		"modules": {
+			"mypackage/qux": true
+		}
+	},
+	"myapp/mustIncludeBarNotFoo": {
+		"modules": {
+			"mypackage/bar": true
+		}
+	},
+	"myapp/mustIncludeFooNotBar": {
+		"modules": {
+			"mypackage/foo": true
+		}
+	},
+	"myapp/mustIncludeFooNotBarNotQux": {
+		"modules": {
+			"mypackage/foo": true
+		}
+	},
+	"myapp/mustBeEmpty1": {
+	},
+	"myapp/mustBeEmpty2": {
+	},
+	"myapp/mustBeEmpty3": {
+	},
+	"myapp/mustBeEmpty4": {
+	},
+	"myapp/pluginResource": {
+		"modules": {
+			"myapp/plugin": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"fooResource": true
+			}
+		}
+	},
+	"myapp/pluginResourceShallow": {
+		"modules": {
+			"myapp/plugin": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"includeShallowResource": true
+			}
+		}
+	},
+	"myapp/excludePlugin": {
+		"plugins": {
+			"myapp/plugin": {
+				"resourceButNoPlugin": true
+			}
+		}
+	},
+	"myapp/excludePlugin2": {
+		"plugins": {
+			"myapp/plugin": {
+				"resourceButNoPlugin": true
+			}
+		}
+	},
+	"myapp/PluginDepsAndDeps": {
+		"modules": {
+			"myapp/plugin": true,
+			"mypackage/bar": true,
+			"mypackage/foo": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"addModules": true
+			}
+		}
+	},
+	"myapp/PluginDeps": {
+		"modules": {
+			"myapp/plugin": true,
+			"mypackage/foo": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"addModules": true
+			}
+		}
+	},
+	"myapp/NoPluginDeps": {
+		"modules": {
+			"myapp/plugin": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"addModules": true
+			}
+		}
+	},
+	"myapp/NoPluginDepsShallow": {
+		"modules": {
+			"myapp/plugin": true
+		},
+		"plugins": {
+			"myapp/plugin": {
+				"addModules": true
+			}
+		}
+	},
+	"myapp/noResource": {
+		"modules": {
+			"myapp/plugin": true,
+			"myapp/src": true
+		}
+	},
+	"myapp/noResourceShallow": {
+		"modules": {
+			"myapp/plugin": true,
+			"myapp/src": true
+		}
+	}
+}

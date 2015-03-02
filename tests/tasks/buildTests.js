@@ -108,7 +108,7 @@ module.exports = function (grunt) {
 				grunt.log.write(path + ": ");
 				grunt.log.ok();
 			} else {
-				deferred.reject();
+				deferred.reject("TestBuilds failed.");
 			}
 		});
 
