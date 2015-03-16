@@ -3,16 +3,26 @@
 	<head>
 		<script src="./bower_components/requirejs/require.js"></script>
 		<script type="text/javascript">
-			var build = window.location.search.substring(1);
-			build = build ? "-" + build : "";
-			require(["requirejs-config" + build], function(){
+			var param = window.location.search.substring(1);
+			var build = param === "build";
+			require(["requirejs-config" + (build ? "-build" : "")], function(){
 				require(["myapp/src"], function(src){
 					src.log();
 				});
 			});
+
+			function init() {
+				var link = "You are using the {{version}} version. <a href=\"?{{otherVersion}}\"	>Click here to use the {{otherVersion}} version</a>";
+				var version = build ? "build" : "source";
+				var otherVersion = build ? "source" : "build";
+				document.getElementById("link").innerHTML = link.replace(/{{version}}/g, version).replace(/{{otherVersion}}/g, otherVersion);
+			}
+
 		</script>
 	</head>
-	<body>
+	<body onload="init()">
 		<div id="main"></div>
+
+		<p id="link"></p>
 	</body>
 </html>
