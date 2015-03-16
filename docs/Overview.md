@@ -3,20 +3,20 @@
 Grunt-amd-build is a grunt plugin providing you with a collection of tasks to help you optimize your AMD application.
 There are two main steps to optimize an AMD application:
 
-	1. Bundle all the AMD modules used by the application into a single file, called a __module layer__.
-	Using a module layer allows the application to load faster by reducing the number of HTTP request to the server.
-	
-	1. Minify javascript code to reduce the size of the download to the client. 
+1. Bundle all the AMD modules used by the application into a single file, called a __module layer__.
+Using a module layer allows the application to load faster by reducing the number of HTTP request to the server.
+
+1. Minify javascript code to reduce the size of the download to the client. 
 
 Grunt-amd-build focus on the first point as there are already a lot of great Javascript minifier online.
 A minimal build process will be composed of 3 tasks:
 	
-	1. `amddepscan`/`amddirscan`: calculates the list of modules to include, names the modules and processes plugin
-	dependencies.
-	
-	1. `amdserialize`: outputs the results of the previous task so they can be fed to a minifier.
-	 
-	1. `uglify` or any other minifier: take the results of the previous task and actually create the module layer.
+1. `amddepscan`/`amddirscan`: calculates the list of modules to include, names the modules and processes plugin
+dependencies.
+
+1. `amdserialize`: outputs the results of the previous task so they can be fed to a minifier.
+ 
+1. `uglify` or any other minifier: take the results of the previous task and actually create the module layer.
 
 Grunt-amd-build provides you with tasks #1 and #2 but __you need to install a minifier to get task #3__.
 
@@ -81,4 +81,4 @@ layers: [{
 for the optimization target.	
 	
 ## See also
-* [Sample Gruntfile Walkthrough](Walkthough.md)
+* [Sample Gruntfile Walkthrough](Walkthrough.md)

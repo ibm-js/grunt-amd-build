@@ -37,9 +37,9 @@ The plugin files that cannot be optimized are just copied from the temporary dir
 __Note:__ Both paths are relative to the Gruntfile.
 
 ```js
-	// The grunt.config property populated by amdserialize, containing the
-	// list of files to include in the layer.
-	var outprop = "amdoutput";
+// The grunt.config property populated by amdserialize, containing the
+// list of files to include in the layer.
+var outprop = "amdoutput";
 ```
 
 This is the name of the grunt config property that will be used to configure UglifyJS.
@@ -56,6 +56,7 @@ amdloader: {
 ```
 The `amdloader` property contains the requirejs configuration of your application.
 This step should be just a copy paste of requirejs configuration.
+
 __Note:__ `baseUrl` is relative to the Gruntfile.
 
 ### amdbuild
