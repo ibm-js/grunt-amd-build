@@ -5,7 +5,7 @@ module.exports = function (grunt) {
 		"*.js",
 		"*.json",
 		"tasks/**/*.js",
-		"sample/*.js",
+		"samples/*.js",
 		"tests/**/*.js",
 		"!**/*_min.js",
 		"!tests/build/**/*"
