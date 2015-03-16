@@ -104,9 +104,15 @@ uglify: {
 	}
 }
 ```
+The banner configuration is __mandatory__ as some plugins will write into this property.
+A custom banner can be added by concatenating the string to the `"<%= " + outprop + ".header%>"`.
+
 For the full list of properties published by `amdserialize` see the [api documentation](api/amdserialize.md).
 
-__Note:__ If you want to use the __source-map__ option in Uglify, you should keep the output of `amdserialize` in the `buildConfig.dir` directory.
+__Notes:__
+* The configuration reference `outprop` using Grunt templates.
+They are evaluated just before the task is run so we are sure that `outprop` is set.
+* If you want to use the __source-map__ option in Uglify, you should keep the output of `amdserialize` in the `buildConfig.dir` directory.
 Otherwise the original sources will not be found.
 
 ### Copying the plugin files
