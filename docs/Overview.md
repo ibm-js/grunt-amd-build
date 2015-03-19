@@ -51,12 +51,12 @@ The build config is split into two common properties:
 ## Limitation
 ###Avoid optimization names that are outside the baseUrl
 
-For example, if `baseUrl` is `'js'`, and the build targets:
+For example, if `baseUrl` is `"js/"`, and the build targets:
 
 ``` 
 layers: [{
 	name: "layer.min",
-	include: ['../main']
+	include: ['../myjs/main']
 }]
 ```
 
@@ -65,7 +65,7 @@ For those cases, create a paths config to map that file to a local name, like:
 
 ```
 paths: {
-    main: '../main'
+    myjs: '../myjs'
 }
 ```
 
@@ -74,11 +74,55 @@ then use:
 ``` 
 layers: [{
 	name: "layer.min",
-	include: ['main']
+	include: ['myjs/main']
 }]
 ```
 
-for the optimization target.	
-	
+for the optimization target.
+
+__Note:__ Using a package with `paths` configuration outside of `baseUrl` to name a layer can result in the layer being written outside the `results` directory.
+For example, with the following configuration:
+
+```js
+amdloader: {
+	baseUrl: "./js",
+	paths: {
+		common: "../../common"
+	}
+},
+
+amdbuild: {
+	layers: [{
+		name: "common/layer",
+		include: ["main"]
+	}]
+}
+```
+
+the layer will be written to `"results/" + "./js/" + "../../common/layer" + ".js"`, ie. to `common/layer.js`, outside the `results` directory.
+
+A work around for this is to use a baseUrl referencing the highest parent directory that your app will access.
+With the previous config it could be:
+
+```js
+amdloader: {
+	baseUrl: "../../app/src/js",
+	paths: {
+		common: "../../common"
+	}
+},
+
+amdbuild: {
+	layers: [{
+		name: "common/layer",
+		include: ["main"]
+	}]
+}
+```
+
+here the layer would be written to `results/app/src/js/../../common` or `results/app/common`.
+Note that the leading `../` in `baseUrl` are removed so the result stay in the right directory.
+
+
 ## See also
 * [Sample Gruntfile Walkthrough](Walkthrough.md)
