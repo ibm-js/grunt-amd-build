@@ -6,7 +6,19 @@ module.exports = function (grunt) {
 		lang = require(libDir + "lang"),
 		normalizeCfg = require(libDir + "normalizeConfig");
 
-	grunt.registerTask("amdserialize", function (layerName, buildCfg, outputProp) {
+	// Trim the leading dots to avoid writing files outside of dir if baseUrl start with ../
+	// Since all paths should start with baseUrl their should be no collision.
+	function getTrimBaseUrlLeadingDots(baseUrl) {
+		var trimmedBaseUrl = baseUrl.replace(/^(\.\/)*(\.\.\/)*/, "");
+		return function (string) {
+			// match baseUrl and replace with the trimmed baseUrl
+			return string.replace(baseUrl, trimmedBaseUrl);
+		};
+	}
+
+	grunt.registerTask("amdserialize", function (layerName, buildCfg, loaderCfg, outputProp) {
+		var loaderConfig = normalizeCfg.loader(grunt.config(loaderCfg));
+		var baseUrl = loaderConfig.baseUrl;
 		var buildConfig = normalizeCfg.build(grunt.config(buildCfg));
 		var layerConfig = buildConfig.layersByName[layerName];
 		var dir = buildConfig.dir;
@@ -19,12 +31,16 @@ module.exports = function (grunt) {
 			rel: []
 		};
 
+
+		var trimBaseUrlLeadingDots = getTrimBaseUrlLeadingDots(baseUrl);
+
 		layerConfig.shim.forEach(function (shim) {
-			var absPath = dir + shim.filepath;
+			var path = trimBaseUrlLeadingDots(shim.filepath);
+			var absPath = dir + path;
 
 			grunt.file.write(absPath, shim.content);
 			modulesFiles.abs.push(absPath);
-			modulesFiles.rel.push(shim.filepath);
+			modulesFiles.rel.push(path);
 		});
 
 		lang.forEachModules(layerConfig.modules, layerName, function (module) {
@@ -32,14 +48,16 @@ module.exports = function (grunt) {
 				grunt.fail.warn("Undefined Path " + module.mid);
 			}
 
-			var path = dir + module.filepath;
-			grunt.file.write(path, module.content);
-			modulesFiles.abs.push(path);
-			modulesFiles.rel.push(module.filepath);
+			var path = trimBaseUrlLeadingDots(module.filepath);
+			var absPath = dir + path;
+			grunt.file.write(absPath, module.content);
+			modulesFiles.abs.push(absPath);
+			modulesFiles.rel.push(path);
 		});
 
 		lang.eachProp(layerConfig.pluginsFiles, function (filepath, content) {
-			var absPath = dir + filepath;
+			var destPath = trimBaseUrlLeadingDots(filepath);
+			var absDestPath = dir + destPath;
 
 			// Process images included in css with url() param.
 			if (/.css$/.test(filepath)) {
@@ -56,7 +74,8 @@ module.exports = function (grunt) {
 				// The assignment is required here to access the matched groups of a global regexp.
 				while ((match = urlRE.exec(content))) {
 					var src = fileDir + match[1];
-					grunt.file.copy(src, dir + src, {
+					var dest = dir + trimBaseUrlLeadingDots(src);
+					grunt.file.copy(src, dest, {
 						encoding: null
 					});
 					pluginsFiles.abs.push(dir + src);
@@ -64,9 +83,9 @@ module.exports = function (grunt) {
 				}
 			}
 
-			grunt.file.write(absPath, content);
-			pluginsFiles.abs.push(absPath);
-			pluginsFiles.rel.push(filepath);
+			grunt.file.write(absDestPath, content);
+			pluginsFiles.abs.push(absDestPath);
+			pluginsFiles.rel.push(destPath);
 		});
 
 		outputProp = outputProp || "amdoutput";
@@ -78,6 +97,6 @@ module.exports = function (grunt) {
 		grunt.config([outputProp, "modules"], modulesFiles);
 		grunt.config([outputProp, "plugins"], pluginsFiles);
 		grunt.config([outputProp, "layerName"], layerName);
-		grunt.config([outputProp, "layerPath"], layerConfig.outputPath);
+		grunt.config([outputProp, "layerPath"], trimBaseUrlLeadingDots(layerConfig.outputPath));
 	});
 };

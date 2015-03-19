@@ -69,7 +69,7 @@ module.exports = function (grunt) {
 
 		layers.forEach(function (layer) {
 			grunt.task.run("amddepsscan:" + layer.name + ":" + name + ":" + amdloader);
-			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + outprop);
+			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + amdloader + ":" + outprop);
 			grunt.task.run("uglify");
 			grunt.task.run("copy:plugins");
 		});

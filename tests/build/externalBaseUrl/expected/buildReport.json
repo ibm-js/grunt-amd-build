@@ -1,0 +1,8 @@
+{
+	"myapp/layer": {
+		"modules": {
+			"myLib/main": true,
+			"myapp/src": true
+		}
+	}
+}

@@ -109,7 +109,7 @@ module.exports = function (grunt) {
 
 		layers.forEach(function (layer) {
 			grunt.task.run("amddepsscan:" + layer.name + ":" + name + ":" + amdloader);
-			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + outprop);
+			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + amdloader + ":" + outprop);
 			// Generate a minified layer only if the name ends with ".min".
 			if (layer.name.search(/\.min$/) !== -1) {
 				grunt.task.run("uglify");

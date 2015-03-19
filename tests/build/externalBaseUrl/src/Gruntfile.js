@@ -14,29 +14,19 @@ module.exports = function (grunt) {
         };
     grunt.initConfig({
         amdloader: {
-            baseUrl: './',
+            baseUrl: '../libs/',
             packages: [
                 {
-                    name: 'mypackage',
-                    location: './mylocalpackage'
+                    name: 'myapp',
+                    location: '../src/myapp'
                 }
             ]
         },
         amdbuild: {
             dir: tmpdir,
             layers: [{
-				// basic include
-				name: 'myapp/base',
-				includeFiles: ["myapp/src.js"]
-			}, {
-				// globbing patterns
-				name: 'myapp/glob',
-				includeFiles: ["myapp/*.js"]
-			}, {
-				// exclude
-				name: 'myapp/exclude',
-				includeFiles: ["myapp/*.js"],
-				excludeFiles: ["myapp/src*"]
+				name: 'myapp/layer',
+				include: ["myapp/src"]
 			}]
         },
         amdreportjson: {
@@ -46,14 +36,6 @@ module.exports = function (grunt) {
             options: { separator: ';\n' },
             dist: common
         },
-        copy: {
-            plugins: {
-                expand: true,
-                cwd: tmpdir,
-                src: '<%= ' + outprop + '.plugins.rel %>',
-                dest: outdir
-            }
-        },
         clean: {
             finish: [tmpdir]
         }
@@ -61,15 +43,14 @@ module.exports = function (grunt) {
     grunt.registerTask('amdbuild', function (amdloader) {
         var name = this.name, layers = grunt.config(name).layers;
         layers.forEach(function (layer) {
-			grunt.task.run('amddirscan:' + layer.name + ':' + name + ':' + amdloader);
+			grunt.task.run('amddepsscan:' + layer.name + ':' + name + ':' + amdloader);
 			grunt.task.run('amdserialize:' + layer.name + ':' + name + ":" + amdloader + ':' + outprop);
             grunt.task.run('concat');
-            grunt.task.run('copy:plugins');
         });
     });
     grunt.registerTask('build', [
         'amdbuild:amdloader',
-        'amdreportjson:amdbuild',
-        'clean:finish'
+        'amdreportjson:amdbuild'/*,
+        'clean:finish'*/
     ]);
 };

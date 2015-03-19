@@ -179,9 +179,8 @@ module.exports = function (grunt) {
     grunt.registerTask('amdbuild', function (amdloader) {
         var name = this.name, layers = grunt.config(name).layers;
         layers.forEach(function (layer) {
-			grunt.task.run("amdshim:" + layer.name + ":" + name + ":" + amdloader);
 			grunt.task.run('amddepsscan:' + layer.name + ':' + name + ':' + amdloader);
-			grunt.task.run('amdserialize:' + layer.name + ':' + name + ':' + outprop);
+			grunt.task.run('amdserialize:' + layer.name + ':' + name + ":" + amdloader + ':' + outprop);
             grunt.task.run('concat');
             grunt.task.run('copy:plugins');
         });
