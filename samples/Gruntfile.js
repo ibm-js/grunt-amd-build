@@ -65,8 +65,9 @@ module.exports = function (grunt) {
 		var name = this.name;
 		var	layers = grunt.config(name).layers;
 
-		grunt.task.run("erase");
+		grunt.task.run("clean:erase");
 
+		// Run all the tasks for all the layers with the right arguments.
 		layers.forEach(function (layer) {
 			grunt.task.run("amddepsscan:" + layer.name + ":" + name + ":" + amdloader);
 			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + amdloader + ":" + outprop);
