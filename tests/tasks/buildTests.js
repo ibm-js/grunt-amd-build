@@ -50,7 +50,7 @@ module.exports = function (grunt) {
 		grunt.log.writeln("Starting build for " + options.cwd + "...");
 		grunt.util.spawn({
 			cmd: "grunt",
-			args: ["build"],
+			args: ["build", "--stack"],
 			opts: options
 		}, getDeferredCallback(deferred));
 		return deferred.promise;
