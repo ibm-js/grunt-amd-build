@@ -27,17 +27,6 @@ module.exports = function (layersMap, layer, loaderConfig, lib, parse, normalize
 	// Add excludeShallow
 	exclude = concatMids(exclude, lib.filterMids(layer.excludeShallow));
 
-	// Add shims and their dependencies
-	var shimDeps = [];
-	if (loaderConfig.shim) {
-		shimDeps = shimDeps.concat(Object.keys(loaderConfig.shim));
-		eachProp(loaderConfig.shim, function (name, value) {
-			shimDeps = shimDeps.concat(value.deps || []);
-		});
-	}
-	// Shim dependencies can only be modules not plugins
-	exclude.modules = exclude.modules.concat(shimDeps);
-
 	// Add layer dependencies
 	var layerDeps = getLayerDeps(layer.excludeLayers, layersMap, lib);
 	exclude = concatMids(exclude, lib.filterMids(layerDeps));
@@ -61,19 +50,41 @@ module.exports = function (layersMap, layer, loaderConfig, lib, parse, normalize
 		excludedResourcesMap[name.mid].push(name.resource);
 	});
 
+
+	// List shims and their dependencies
+	var shimDeps = [];
+	if (loaderConfig.shim) {
+		shimDeps = shimDeps.concat(Object.keys(loaderConfig.shim));
+		eachProp(loaderConfig.shim, function (name, value) {
+			shimDeps = shimDeps.concat(value.deps || []);
+		});
+	}
+
+	function isShim(mid) {
+		if (shimDeps.indexOf(mid) !== -1) {
+			if (loaderConfig.shim[mid] && !excludedModulesMap[mid]) {
+				// Store the shim for future use
+				layer.shim.push(mid);
+			}
+			return true;
+		}
+		return false;
+	}
+
+
 	return {
 		// True if the module should be added in the layer.
 		isModuleToInclude: function (mid) {
-			return !excludedModulesMap[mid];
+			return !isShim(mid) && !excludedModulesMap[mid];
 		},
 		// True if the resource should be processed
 		isResourceToProcess: function (name) {
 			var plugin = excludedResourcesMap[name.mid];
 			return !plugin || plugin.indexOf(name.resource) === -1;
 		},
-		// True if mid is explicitly listed in exclude or excludeShallow
+		// True if mid is explicitly listed in exclude or excludeShallow or if it's a shim
 		isStrictlyExcluded: function (mid) {
-			return layer.exclude.indexOf(mid) >= 0 || layer.excludeShallow.indexOf(mid) >= 0;
+			return isShim(mid) || layer.exclude.indexOf(mid) >= 0 || layer.excludeShallow.indexOf(mid) >= 0;
 		}
 	};
 };

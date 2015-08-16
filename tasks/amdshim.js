@@ -31,9 +31,13 @@ module.exports = function (grunt) {
 			return shim1.deps && (shim1.deps.indexOf(shim2) !== -1);
 		}
 
-		var shim = loaderConfig.shim;
+		if (layer.shim) {
+			var shim = {};
+			layer.shim.forEach(function (shimDep) {
+				shim[shimDep] = loaderConfig.shim[shimDep];
+			});
+			layer.shim = [];
 
-		if (shim) {
 			// First add AMD dependencies that should have no dependencies so they can be loaded first and in any order.
 			// cf: https://github.com/jrburke/requirejs/blob/7b83f238885109cb773b922efb8d53db652952d6/docs/api.html#L687
 			var amdDeps = [];
@@ -53,7 +57,6 @@ module.exports = function (grunt) {
 				value.content = grunt.file.read(value.filepath);
 				layer.shim.push(value);
 			});
-
 
 
 			// flatten deps
@@ -108,7 +111,7 @@ module.exports = function (grunt) {
 				};
 
 				shimValue.content = grunt.file.read(shimValue.filepath) +
-					"define(\"" + id + "\", (function (global) {\n" +
+					"\ndefine(\"" + id + "\", (function (global) {\n" +
 					"	return function () {\n" +
 					"		var ret;\n" +
 					(value.init ? (
