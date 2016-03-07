@@ -35,12 +35,16 @@ module.exports = function (grunt) {
 		var trimBaseUrlLeadingDots = getTrimBaseUrlLeadingDots(baseUrl);
 
 		layerConfig.shim.forEach(function (shim) {
-			var path = trimBaseUrlLeadingDots(shim.filepath);
-			var absPath = dir + path;
+			// If shims have been processed by amdshim, shim will be an object.
+			// Otherwise it will be a string.
+			if (typeof shim === "object") {
+				var path = trimBaseUrlLeadingDots(shim.filepath);
+				var absPath = dir + path;
 
-			grunt.file.write(absPath, shim.content);
-			modulesFiles.abs.push(absPath);
-			modulesFiles.rel.push(path);
+				grunt.file.write(absPath, shim.content);
+				modulesFiles.abs.push(absPath);
+				modulesFiles.rel.push(path);
+			}
 		});
 
 		lang.forEachModules(layerConfig.modules, layerName, function (module) {

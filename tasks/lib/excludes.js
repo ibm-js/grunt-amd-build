@@ -62,8 +62,9 @@ module.exports = function (layersMap, layer, loaderConfig, lib, parse, normalize
 
 	function isShim(mid) {
 		if (shimDeps.indexOf(mid) !== -1) {
-			if (loaderConfig.shim[mid] && !excludedModulesMap[mid]) {
-				// Store the shim for future use
+			// If shim is not excluded and not already in the layer shim dependencies list,
+			// store it for future use
+			if (!excludedModulesMap[mid] && layer.shim.indexOf(mid) === -1) {
 				layer.shim.push(mid);
 			}
 			return true;
