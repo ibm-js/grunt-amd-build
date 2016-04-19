@@ -62,8 +62,8 @@ module.exports = function (grunt) {
 			// Process images included in css with url() param.
 			if (/.css$/.test(filepath)) {
 				var fileDir = filepath.replace(/[^\/]*$/, "");
-				// The (?!data:) is to avoid inlined images.
-				var urlRE = /url\(['"]?(?!data:)([^#\?\)'"]*)[^\)'"]*['"]?\)/g;
+				// The (?!(?:data|https?):) is to avoid inlined and external images.
+				var urlRE = /url\(['"]?(?!(?:data|https?):)([^#\?\)'"]*)[^\)'"]*['"]?\)/g;
 				var match = null;
 
 				// This is needed in case of relative path using ../, because grunt.file.copy while try to go down to
