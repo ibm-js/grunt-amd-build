@@ -50,7 +50,7 @@ module.exports = function (grunt) {
 				],
 				excludeShallow: [
 					// Only the modules listed here (ie. NOT their dependencies)  will NOT be in this layer.
-				],
+				]
 			}, {
 				name: "main.min",
 				include: [
@@ -110,6 +110,7 @@ module.exports = function (grunt) {
 		// Run all the tasks for all the layers with the right arguments.
 		layers.forEach(function (layer) {
 			grunt.task.run("amddepsscan:" + layer.name + ":" + name + ":" + amdloader);
+			grunt.task.run("amdshim:" + layer.name + ":" + name + ":" + amdloader);
 			grunt.task.run("amdserialize:" + layer.name + ":" + name + ":" + amdloader + ":" + outprop);
 			// Generate a minified layer only if the name ends with ".min".
 			if (layer.name.search(/\.min$/) !== -1) {

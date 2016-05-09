@@ -1,7 +1,7 @@
 {
 	"name": "grunt-amd-build",
 	"description": "Grunt plugin to build AMD applications.",
-	"version": "0.10.0-alpha",
+	"version": "0.10.0-rc1",
 	"homepage": "https://github.com/ibm-js/grunt-amd-build",
 	"repository": {
 		"type": "git",
@@ -19,18 +19,18 @@
 		"node": ">= 0.10.0"
 	},
 	"devDependencies": {
-		"grunt-contrib-jshint": "~0.6.0",
-		"grunt": "~0.4.1",
-		"grunt-jsbeautifier": "~0.2.2",
-		"grunt-lineending": "~0.2.2",
-		"intern": "~1.7.0",
+		"grunt-contrib-jshint": "0.6.x",
+		"grunt": "0.4.x",
+		"grunt-jsbeautifier": "0.2.x",
+		"grunt-lineending": "0.2.x",
+		"intern": "2.2.x",
 		"promised-io": "0.3.x"
 	},
 	"peerDependencies": {
 		"grunt": ">=0.4.0"
 	},
 	"dependencies": {
-		"requirejs": "~2.1.9"
+		"requirejs": "2.1.x"
 	},
 	"keywords": [
 		"gruntplugin", "amd", "build"

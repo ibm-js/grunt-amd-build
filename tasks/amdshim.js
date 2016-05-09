@@ -3,7 +3,6 @@ module.exports = function (grunt) {
 
 	var libDir = "./lib/";
 	var normalizeCfg = require(libDir + "normalizeConfig");
-	var eachProp = require(libDir + "lang").eachProp;
 	var getUtils = require(libDir + "utils");
 
 	grunt.registerTask("amdshim", function (layerName, buildCfg, loaderCfg) {
@@ -23,6 +22,8 @@ module.exports = function (grunt) {
 		}
 		loaderConfig = normalizeCfg.loader(grunt.config(loaderCfg));
 
+		var shimConfig = loaderConfig.shim;
+
 		var utils = getUtils(loaderConfig);
 
 		// Return true if shim2 is a deps of shim1
@@ -31,23 +32,67 @@ module.exports = function (grunt) {
 			return shim1.deps && (shim1.deps.indexOf(shim2) !== -1);
 		}
 
+		// return an array of all the dependencies of `deps`
+		// deps is an array of dependencies from a shim config
+		function getAllDependencies(deps) {
+			var result = [];
+			var fifo = [].concat(deps);
+			while (fifo.length) {
+				var currId = fifo.pop();
+				result.push(currId);
+
+				var currValue = shimConfig[currId];
+				if (currValue && currValue.deps) {
+					currValue.deps.forEach(function (id) {
+						if (result.indexOf(id) === -1) {
+							fifo.push(id);
+						}
+					});
+				}
+			}
+			return result;
+		}
+
 		if (layer.shim) {
-			var shim = {};
-			layer.shim.forEach(function (shimDep) {
-				shim[shimDep] = loaderConfig.shim[shimDep];
-			});
+			// Expand the list of shim with all their dependencies
+			var shims = layer.shim.reduce(function (shims, shimId) {
+				shims.push(shimId);
+				if (shimConfig[shimId] && shimConfig[shimId].deps) {
+					getAllDependencies(shimConfig[shimId].deps).forEach(function (dep) {
+						if (shims.indexOf(dep) === -1) {
+							shims.push(dep);
+						}
+					});
+					return shims;
+				} else {
+					return shims;
+				}
+			}, []);
+
+			// reset layer.shim to put shims back in order
 			layer.shim = [];
+
+			// Alert user if a shim that they wanted to exclude will be included anyway
+			shims.forEach(function (shimId) {
+				if (layer.exclude.indexOf(shimId) !== -1 || layer.excludeShallow.indexOf(shimId) !== -1) {
+					grunt.fail.warn("You tried to exclude " + shimId + " but it will be included anyway as it " +
+						"is pulled as a dependency by another shim. You can try removing it from the exclude list " +
+						"or excluded the shim(s) depending on it.");
+				}
+			});
 
 			// First add AMD dependencies that should have no dependencies so they can be loaded first and in any order.
 			// cf: https://github.com/jrburke/requirejs/blob/7b83f238885109cb773b922efb8d53db652952d6/docs/api.html#L687
 			var amdDeps = [];
-			eachProp(shim, function (id, value) {
-				if (value.deps) {
-					value.deps.forEach(function (dep) {
-						if (!shim[dep] && amdDeps.indexOf(dep) === -1) {
-							amdDeps.push(dep);
-						}
-					});
+			shims = shims.filter(function (shimId) {
+				var value = shimConfig[shimId];
+				if (!value) {
+					if (amdDeps.indexOf(shimId) === -1) {
+						amdDeps.push(shimId);
+					}
+					return false;
+				} else {
+					return true;
 				}
 			});
 			amdDeps.forEach(function (dep) {
@@ -59,39 +104,20 @@ module.exports = function (grunt) {
 			});
 
 
-			// flatten deps
-			var flatShim = {};
-
-			eachProp(shim, function (id, value) {
-				var newValue = {
-					deps: value.deps ? [].concat(value.deps) : [],
-					exports: value.exports,
-					init: value.init
+			// Get the list of all dependencies for each shim to order them
+			var shimMap = shims.reduce(function (shimMap, shimId) {
+				shimMap[shimId] = {
+					deps: shimConfig[shimId].deps ? getAllDependencies(shimConfig[shimId].deps) : [],
+					exports: shimConfig[shimId].exports,
+					init: shimConfig[shimId].init
 				};
-
-				var fifo = [].concat(newValue.deps);
-				while (fifo.length) {
-					var currId = fifo.pop();
-					var currValue = shim[currId];
-
-					if (currValue && currValue.deps) {
-						currValue.deps.forEach(function (id) {
-							if (newValue.deps.indexOf(id) === -1) {
-								newValue.deps.push(id);
-								fifo.push(id);
-							}
-						});
-					}
-				}
-
-				flatShim[id] = newValue;
-			});
-
+				return shimMap;
+			}, {});
 
 			// Sort shims with respect to dependencies order.
-			var shimAry = Object.keys(flatShim).sort(function (shim1, shim2) {
-				var value1 = flatShim[shim1];
-				var value2 = flatShim[shim2];
+			shims = Object.keys(shimMap).sort(function (shim1, shim2) {
+				var value1 = shimMap[shim1];
+				var value2 = shimMap[shim2];
 
 				if (isDeps(value1, shim2)) {
 					return 1;
@@ -103,9 +129,7 @@ module.exports = function (grunt) {
 			});
 
 			// Add the shims to the layer.
-			shimAry.forEach(function (id) {
-				var value = shim[id];
-
+			shims.forEach(function (id) {
 				var shimValue = {
 					filepath: utils.nameToFilepath(id)
 				};
@@ -114,12 +138,12 @@ module.exports = function (grunt) {
 					"\ndefine(\"" + id + "\", (function (global) {\n" +
 					"	return function () {\n" +
 					"		var ret;\n" +
-					(value.init ? (
-					"		var fn = " + value.init.toString() + ";\n" +
+					(shimMap[id].init ? (
+					"		var fn = " + shimMap[id].init.toString() + ";\n" +
 					"       ret = fn.apply(global, arguments);\n") : "") +
-					(value.exports ?
-					"		return ret || global[\"" + value.exports + "\"];\n" :
-					"		return ret;\n") +
+					(shimMap[id].exports ?
+					"		return ret || global[\"" + shimMap[id].exports + "\"];\n" :
+						"		return ret;\n") +
 					"    };\n" +
 					"})(this));";
 
