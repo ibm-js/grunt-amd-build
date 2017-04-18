@@ -10,10 +10,12 @@
 	"bugs": {
 		"url": "https://github.com/ibm-js/grunt-amd-build/issues"
 	},
-	"licenses": [{
-		"type": "BSD",
-		"url": "https://github.com/ibm-js/grunt-amd-build/blob/master/LICENSE"
-	}],
+	"licenses": [
+		{
+			"type": "BSD",
+			"url": "https://github.com/ibm-js/grunt-amd-build/blob/master/LICENSE"
+		}
+	],
 	"main": "Gruntfile.js",
 	"engines": {
 		"node": ">= 0.10.0"
@@ -33,7 +35,9 @@
 		"requirejs": "2.1.x"
 	},
 	"keywords": [
-		"gruntplugin", "amd", "build"
+		"gruntplugin",
+		"amd",
+		"build"
 	],
 	"readmeFilename": "README.md"
 }
